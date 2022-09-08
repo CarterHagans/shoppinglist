@@ -19,7 +19,27 @@
       <button type="button" class="btn btn-primary btn-lg btn-block">Click here to add your first item!</button>
       </a>
       {% else %}
-      {{length_of_list}}
+
+      {% for item in list %}
+
+      <div id="test">
+        <a id="listitem"  class="list-group-item list-group-item-action">{{ item.split(":",1)[0] }}</a>
+        {% if user_has_permissions == True %}
+
+        <a href="/families/{{family._id}}/list/remove/{{item.split(':',1)[1]}}">
+        <button id="removebtn" >Remove</button>
+        </a>
+        <a href="/families/{{family._id}}/list/edit/{{item.split(':',1)[1]}}">
+        <button id="editbtn">Edit</button>
+        </a>
+        {% endif %}
+      </div>
+
+
+      {% endfor %}
+      <a href="/families/{{family._id}}/list/add">
+        <button type="button" class="btn btn-primary btn-lg btn-block">Add an item to your list</button>
+        </a>
       {% endif %}
 
 </body>

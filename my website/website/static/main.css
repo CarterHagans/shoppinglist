@@ -207,7 +207,21 @@
   text-align: center;
 }
 
+#listitem{
+  cursor: default;
+}
 
+#removebtn{
+  border: none;
+  background-color:#ff1361;
+  font-family: cursive;
+}
+
+#editbtn{
+  border: none;
+  background-color:#ffe436;
+  font-family: cursive;
+}
 
 /* ---------------------- End of list.html styles ---------------------- */
 

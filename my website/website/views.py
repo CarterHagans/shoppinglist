@@ -1,5 +1,7 @@
+from inspect import currentframe
 import json
 from operator import truediv
+from pkgutil import iter_modules
 from flask import Blueprint, render_template, request,flash,redirect,session,url_for
 import time
 from .models import User,Families
@@ -54,6 +56,9 @@ def login():
 
 
 
+
+
+
 @views.route("/families",methods=["POST","GET"])
 def families():
     if request.method == "GET": # when the user enters the page that shows the  families
@@ -81,6 +86,9 @@ def families():
 
 
 
+
+
+
 @views.route('/families/<id>')
 def view_family(id):
     if request.method == "GET": 
@@ -100,9 +108,15 @@ def view_family(id):
                         canAccess = True
                         canManageFamily = True
         if canAccess == True:
+            
             return render_template("view_family.html",family=currentFamily,user_has_permissions=canManageFamily)
         else: 
             return redirect("/")
+
+
+
+
+
 
 @views.route('/families/<id>/list')
 def family_list(id):
@@ -125,10 +139,16 @@ def family_list(id):
                 
         if canAccess == True:
             lengthOfList = len(json.loads(currentFamily.shopping_list))
-            return render_template("list.html",family=currentFamily,user_has_permissions=canManageFamily,length_of_list=lengthOfList)
+            shoppingList = json.loads(currentFamily.shopping_list)
+            return render_template("list.html",list=shoppingList,family=currentFamily,user_has_permissions=canManageFamily,length_of_list=lengthOfList)
         else: 
             return redirect("/")
-
+    
+    
+    
+    
+    
+    
 @views.route('/families/<id>/list/add',methods=["POST","GET"])
 def add_item_to_list(id):
     currentFamily = Families.query.filter_by(_id=id).first()
@@ -157,12 +177,56 @@ def add_item_to_list(id):
         name_of_item = request.form.get("item_name")
         amount_of_item = int(request.form.get("quantity"))
         converted_list = json.loads(currentFamily.shopping_list)
+        length_of_existing_list = len(converted_list) + 1
         for x in range(amount_of_item):
-            converted_list.append(name_of_item)
-        print(converted_list)
+            converted_list.append(name_of_item +f" :{length_of_existing_list}")
+            length_of_existing_list +=1
+        completed_list = json.dumps(converted_list)
+        currentFamily.shopping_list = completed_list
+        db.session.commit()
+        print(currentFamily.shopping_list)
         return redirect(f"/families/{id}/list")
             
-        
+
+
+
+
+@views.route('/families/<id>/list/remove/<item_id>',methods=["POST","GET"])
+def remove_item(id,item_id):
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            current_user = session.get("username")
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.members:
+                        canAccess = True
+                    elif current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+        if canAccess == True and  canManageFamily == True:
+            families_list = json.loads(currentFamily.shopping_list)
+            for item in families_list:
+                if item.split(':',1)[1] == item_id:
+                    families_list.remove(item)
+
+            currentFamily.shopping_list = json.dumps(families_list)
+            db.session.commit()
+            return redirect(f'/families/{id}/list')
+        else:
+            return redirect(f'/families/{id}/list')
+    return redirect(f"/families/{id}/list")
+
+
+
+
 
 @views.route("/create-family",methods=["POST","GET"])
 def create_family():
@@ -197,6 +261,9 @@ def create_family():
             return redirect("/families")
         
         
+
+
+
 
 @views.route('/signup',methods=["POST","GET"])
 def signup():
