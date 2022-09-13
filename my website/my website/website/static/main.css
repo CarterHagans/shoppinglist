@@ -1,0 +1,264 @@
+/* ---------------------- Start of Home.html styles ---------------------- */
+
+#homeBody {
+    -webkit-animation: background 5s cubic-bezier(1,0,0,1) infinite;
+    animation: background 5s cubic-bezier(1,0,0,1) infinite;  
+}
+
+#homePage_startButton{
+    position: relative;
+    width: 300px;
+    height: 100px;
+    left: 500px;
+    top: 50px;
+    border: 1.7px solid black;
+    font-size: 2vw;
+    font-family:cursive;
+    font-weight: bolder;
+    -webkit-animation: bounce .3s infinite alternate;
+    -moz-animation: bounce .3s infinite alternate;
+    animation: bounce .3s infinite alternate;
+}
+
+#homePage_aboutButton{
+    position: relative;
+    width: 300px;
+    height: 100px;
+    left: 195px;
+    top: 200px;
+    border: 1.7px solid black;
+    font-size: 2vw;
+    font-family:cursive;
+    font-weight: bolder;
+}
+
+#homePage_loginButton{
+    position: relative;
+    width: 300px;
+    height: 100px;
+    left: -110px;
+    top: 350px;
+    border: 1.7px solid black;
+    font-size: 2vw;
+    font-family:cursive;
+    font-weight: bolder;
+}
+
+#homePage_aboutButton:hover{
+    background-color: black;
+    color: white;
+    border: 1.7px solid white;
+    transform: scale(1.15) perspective(1px);
+}
+
+#homePage_loginButton:hover{
+    background-color: black;
+    color: white;
+    border: 1.7px solid white;
+    transform: scale(1.15) perspective(1px);
+}
+
+#homePage_startButton:hover{
+    background-color: black;
+    color: white;
+    border: 1.7px solid white;
+}
+
+#headTitle{
+    text-align: center;
+    color: white;
+    font-size: 4vw;
+    font-family: cursive;
+    font-weight: bolder;
+}
+
+/* ---------------------- End of Home.html styles ---------------------- */
+/* ---------------------- Start of Start.html styles ---------------------- */
+#startBody{
+    background-color: black;
+    display: flex;
+    justify-content: center;
+
+    min-height: 100vh;
+}
+.startHeaderElements{
+    position: relative;
+    left: 475px;
+}
+
+.startHeaderElements span{
+    position: relative;
+    display: inline-block;
+    font-size:4vw;
+    color: #fff;
+    text-transform: uppercase;
+    animation: flip 2s infinite;
+    animation-delay: calc(.2s * var(--i));
+
+}
+#startDesc{
+
+    position: relative;
+    top: 100px;
+    color: white;
+    left: -160px;
+    font-size: 1.5vw;
+    font-family: cursive;
+    font-weight: bolder;
+}
+
+
+
+/* ---------------------- End of Start.html styles ---------------------- */
+/* ---------------------- Start of signup.html styles ---------------------- */
+.animate-charcter
+{
+   text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 100px;
+}
+
+
+
+
+/* ---------------------- End of signup.html styles ---------------------- */
+/* ---------------------- Start of families.html styles ---------------------- */
+.animate-families
+{
+   text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 80px;
+}
+
+#familiesDesc{
+  text-align: center;
+}
+
+#createFamilyBtn{
+  position: relative;
+  left: 550px;
+  top: 75px;
+}
+
+#createFamilylink{
+  position: relative;
+  left: 550px;
+  top: 20px;
+}
+/* ---------------------- End of families.html styles ---------------------- */
+
+
+/* ---------------------- Start of list.html styles ---------------------- */
+.animate-list{
+  text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 60px;
+}
+
+#listHead{
+  text-align: center;
+}
+
+#listitem{
+  cursor: default;
+}
+
+#removebtn{
+  border: none;
+  background-color:#ff1361;
+  font-family: cursive;
+}
+
+#editbtn{
+  border: none;
+  background-color:#ffe436;
+  font-family: cursive;
+}
+
+/* ---------------------- End of list.html styles ---------------------- */
+
+/* ---------------------- Start of animations---------------------- */  
+@-webkit-keyframes bounce {
+    to { -webkit-transform: scale(1.2); }
+  }
+  @-moz-keyframes bounce {
+    to { -moz-transform: scale(1.2); }
+  }
+  @keyframes bounce {
+    to { transform: scale(1.2); }
+  }
+
+@-webkit-keyframes background {
+    0% { background-color: #f99; }
+    33% { background-color: #9f9; }  
+    67% { background-color: #99f; }
+    100% { background-color: #f99; }
+}
+  
+@keyframes background {
+    0% { background-color: #f99; }
+    33% { background-color: #9f9; }  
+    67% { background-color: #99f; }
+    100% { background-color: #f99; }
+}
+
+@keyframes flip {
+    0%,80% {
+      transform: rotateY(360deg) 
+    }
+  }
+@keyframes textclip {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+/* ---------------------- End of animations ---------------------- */

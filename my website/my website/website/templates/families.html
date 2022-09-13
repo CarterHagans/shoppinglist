@@ -1,0 +1,36 @@
+<title>Virtual Shopping List - Families</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="./static/main.css">
+</head>
+
+<body id="familiesBody">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h3 class="animate-families"> YOUR FAMILIES</h3>
+      </div>
+    </div>
+  </div>
+    {% if num_of_families == 0 %} 
+      <h2 id="familiesDesc">Hello {{username}}! You are currently in no families. If you want to create a family, you can click the button below. Otherwise,
+        if you want to join an already existing family, please have the owner of the family or an admin of the family invite you. Once they invite you, 
+        you will receive an email with more information.
+      </h2>
+      <a href="/create-family">
+        <button id="createFamilyBtn"type="button" class="btn btn-primary btn-lg">Create Family</button>
+      </a>
+
+      {% else %}
+      <div class="list-group"></div>
+      {% for family in users_families %}
+      <a href="/families/{{family._id}}" class="list-group-item list-group-item-action">{{  family.name  }}</a>
+      {% endfor %}
+      <a href="/create-family">
+      <button type="submit" class="btn btn-primary" id="createFamilylink">Create new family</button>
+      </a>
+      {% endif %}
+
+
+
+</body>

@@ -1,0 +1,45 @@
+<title>{{ family.name }} - Shopping List</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="listBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list"> {{ family.name }} - Shopping List</h3>
+          </div>
+        </div>
+      </div>
+
+      {% if length_of_list == 0 %}
+      <p id="listHead"class="h1">You have no items in your shopping list.</p>
+      <a href="/families/{{family._id}}/list/add">
+      <button type="button" class="btn btn-primary btn-lg btn-block">Click here to add your first item!</button>
+      </a>
+      {% else %}
+
+      {% for item in list %}
+
+      <div id="test">
+        <a id="listitem"  class="list-group-item list-group-item-action">{{ item.split(":",1)[0] }}</a>
+        {% if user_has_permissions == True %}
+
+        <a href="/families/{{family._id}}/list/remove/{{item.split(':',1)[1]}}">
+        <button id="removebtn" >Remove</button>
+        </a>
+        <a href="/families/{{family._id}}/list/edit/{{item.split(':',1)[1]}}">
+        <button id="editbtn">Edit</button>
+        </a>
+        {% endif %}
+      </div>
+
+
+      {% endfor %}
+      <a href="/families/{{family._id}}/list/add">
+        <button type="button" class="btn btn-primary btn-lg btn-block">Add an item to your list</button>
+        </a>
+      {% endif %}
+
+</body>
