@@ -1,0 +1,37 @@
+<title>{{ family.name }} - Inventory Audit Log</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="listAuditLogBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list">Inventory Audit Log</h3>
+          </div>
+        </div>
+      </div>
+
+      {% if auditLogLength == 0 %}
+      <p id="listHead"class="h1">No actions have been performed in this family.</p>
+      <a href="/families/{{family._id}}/list">
+      <button type="button" class="btn btn-danger btn-lg btn-block">Back to inventory</button>
+      </a>
+      {% else %}
+      {% for item in auditLog %}
+
+      <div id="test">
+        <a id="listitem"  class="list-group-item list-group-item-action">{{item}}</a>
+        
+
+
+        {% endfor %}
+        <a href="/families/{{family._id}}/list">
+            <button type="button" class="btn btn-danger btn-lg btn-block">Back to inventory</button>
+            </a>
+        {% endif %}
+      </div>
+
+
+</body>
