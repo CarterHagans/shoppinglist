@@ -4,7 +4,7 @@ from operator import truediv
 from pkgutil import iter_modules
 from re import L
 from flask import Blueprint, render_template, request,flash,redirect,session,url_for
-import time
+import datetime
 from .models import User,Families
 from . import db
 from flask_sqlalchemy import SQLAlchemy
@@ -152,12 +152,12 @@ def family_list(id):
     
     
     
-    
-    
-    
-@views.route('/families/<id>/list/add',methods=["POST","GET"])
-def add_item_to_list(id):
+
+@views.route('/families/<id>/list/audit-log',methods=["POST","GET"])
+def shopping_audit_log(id):
     currentFamily = Families.query.filter_by(_id=id).first()
+    families_auditLog = json.loads(currentFamily.audit_log)
+    length_of_audit_log = len(families_auditLog)
     if request.method == "GET":
 
         canAccess = False
@@ -168,6 +168,33 @@ def add_item_to_list(id):
             return redirect("/")
         else:
             current_user = session.get("username")
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True:
+            return render_template("list_auditlog.html",family=currentFamily,auditLog=families_auditLog,auditLogLength=length_of_audit_log)
+        else: 
+            return redirect("/")
+    
+    
+@views.route('/families/<id>/list/add',methods=["POST","GET"])
+def add_item_to_list(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
             for user in User.query.all():
                 if user.name == current_user:
                     if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
@@ -188,10 +215,17 @@ def add_item_to_list(id):
             converted_list.append(name_of_item +f" :{length_of_existing_list}")
             length_of_existing_list +=1
         completed_list = json.dumps(converted_list)
+        currentAuditLog = json.loads(currentFamily.audit_log)
+        current_time = datetime.datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        currentAuditLog.append(f'{formatted_time}: {current_user} has added {amount_of_item} of {name_of_item}(s)')
+        currentFamily.audit_log = json.dumps(currentAuditLog)
+
+
         currentFamily.shopping_list = completed_list
         currentFamily.num_of_items = length_of_existing_list
         db.session.commit()
-        print(currentFamily.shopping_list)
+        
         return redirect(f"/families/{id}/list")
             
 
@@ -202,7 +236,7 @@ def add_item_to_list(id):
 def remove_item(id,item_id):
     currentFamily = Families.query.filter_by(_id=id).first()
     if request.method == "GET":
-
+        auditLogItem = None
         canAccess = False
         canManageFamily = False
 
@@ -223,7 +257,12 @@ def remove_item(id,item_id):
             for item in families_list:
                 if item.split(':',1)[1] == item_id:
                     families_list.remove(item)
-
+                    auditLogItem = item.split(':',1)[0]
+            currentAuditLog = json.loads(currentFamily.audit_log)
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog.append(f'{formatted_time}: {current_user} has removed {auditLogItem} from the list ')
+            currentFamily.audit_log = json.dumps(currentAuditLog)
             currentFamily.shopping_list = json.dumps(families_list)
             db.session.commit()
             return redirect(f'/families/{id}/list')
@@ -239,6 +278,7 @@ def remove_item(id,item_id):
 @views.route('/families/<id>/list/edit/<item_id>',methods=["POST","GET"])
 def edit_item(id,item_id):
     currentFamily = Families.query.filter_by(_id=id).first()
+    current_user = session.get("username")
     if request.method == "GET":
 
         canAccess = False
@@ -247,7 +287,7 @@ def edit_item(id,item_id):
             flash("You must be logged in!")
             return redirect("/")
         else:
-            current_user = session.get("username")
+
 
             for user in User.query.all():
                 if user.name == current_user:
@@ -295,7 +335,14 @@ def edit_item(id,item_id):
                     new_list[index] = new_name + f":{item_id}"
                     currentFamily.shopping_list = json.dumps(new_list)
                     db.session.commit()
-                index+=1
+                    index+=1
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} to a new name of {new_name}')
+            currentFamily.audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
+
         if new_amount != count:
             for item in json.loads(currentFamily.shopping_list):
                 if item.split(':',1)[1] == item_id:
@@ -313,8 +360,13 @@ def edit_item(id,item_id):
                         currentFamily.shopping_list = json.dumps(loaded_list)
                         currentFamily.num_of_items = add_item_index
                         db.session.commit()
-                             # add the new quantity
-
+            
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} that had a quantity of {count} to have a new quantity of {new_amount}')
+            currentFamily.audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
         
         return redirect(f'/families/{id}/list')
         
@@ -348,7 +400,7 @@ def create_family():
                     users_families.append(family_name)
                     user.families = json.dumps(users_families)
                     db.session.commit()
-            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([family_owner]),json.dumps([]),json.dumps([]),json.dumps([]),0)
+            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([family_owner]),json.dumps([]),json.dumps([]),json.dumps([]),0,json.dumps([]))
 
             db.session.add(family_to_be_created)
             db.session.commit()

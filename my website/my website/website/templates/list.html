@@ -18,6 +18,12 @@
       <a href="/families/{{family._id}}/list/add">
       <button type="button" class="btn btn-primary btn-lg btn-block">Click here to add your first item!</button>
       </a>
+      <a href="/families/{{family._id}}/list/audit-log">
+        <button type="button" class="btn btn-secondary btn-lg btn-block">Audit Log</button>
+      </a>
+      <a href="/families/{{family._id}}">
+        <button type="button" class="btn btn-danger btn-lg btn-block">Back to family main page</button>
+        </a>
       {% else %}
 
       {% for item in list %}
@@ -39,6 +45,12 @@
       {% endfor %}
       <a href="/families/{{family._id}}/list/add">
         <button type="button" class="btn btn-primary btn-lg btn-block">Add an item to your list</button>
+        </a>
+      <a href="/families/{{family._id}}/list/audit-log">
+        <button type="button" class="btn btn-secondary btn-lg btn-block">Audit Log</button>
+      </a>
+      <a href="/families/{{family._id}}">
+        <button type="button" class="btn btn-danger btn-lg btn-block">Back to family main page</button>
         </a>
       {% endif %}
 

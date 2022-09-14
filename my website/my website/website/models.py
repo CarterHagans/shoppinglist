@@ -26,8 +26,9 @@ class Families(db.Model):
     shopping_list = db.Column(db.String(10000))
     inventory = db.Column(db.String(10000))
     num_of_items = db.Column(db.Integer)
+    audit_log = db.Column(db.String(10000))
     
-    def __init__(self,name,creator_name,creator_email,members,admins,shopping_list,inventory,num_of_items):
+    def __init__(self,name,creator_name,creator_email,members,admins,shopping_list,inventory,num_of_items,audit_log):
         self.name =name
         self.creator_name = creator_name
         self.creator_email = creator_email
@@ -36,3 +37,4 @@ class Families(db.Model):
         self.shopping_list =  shopping_list
         self.inventory = inventory
         self.num_of_items = num_of_items
+        self.audit_log = audit_log
