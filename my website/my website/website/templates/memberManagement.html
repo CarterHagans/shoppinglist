@@ -1,0 +1,55 @@
+<title>{{ family.name }} - Member Management</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="listBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list"> {{ family.name }} - Member Management</h3>
+          </div>
+        </div>
+      </div>
+    {% if owner == True %}
+
+    {% if admin_amount == 0 and member_amount == 0%}
+    <p id="listHead"class="h1">Something went wrong.</p>
+
+    {% else %}
+
+      {% for admin in adminInfo %}
+
+      <div id="test">
+        <a id="listitem" href="/families/{{family._id}}/member-management/{{admin._id}}" class="list-group-item list-group-item-action">{{admin.name}} (ADMIN)</a>
+        </div>
+        {% endfor %}
+        {% for member in memberInfo %}
+        {% if member.name == family.creator_name %}
+        <div id="test">
+          <a id="listitem" onclick="ownerBtn();" class="list-group-item list-group-item-action">{{member.name}} (OWNER)</a>
+          </div>
+          {% else %}
+          <div id="test">
+            <a id="listitem" href="/families/{{family._id}}/member-management/{{member._id}}" class="list-group-item list-group-item-action">{{member.name}} (MEMBER)</a>
+            </div>
+          {% endif %}
+          {% endfor %}
+    {% endif %}
+
+    {% else %}
+
+    {% endif %}
+    <a href="/families/{{family._id}}/member-management/invite">
+    <button type="button"  id="viewMemberKickBtn"class="btn btn-primary btn-lg btn-block">Invite user to {{ family.name }} </button>
+    </a>
+    <a href="/families/{{family._id}}">
+      <button type="button"  id="viewMemberKickBtn"class="btn btn-danger btn-lg btn-block">Back to main family page </button>
+      </a>
+    <script>
+      function ownerBtn(){
+        alert("You can not edit the owner's permissions.")
+      }
+    </script>
+</body>

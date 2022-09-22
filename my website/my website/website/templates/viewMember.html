@@ -1,0 +1,20 @@
+<title>Member Management - {{userToShow.name}}</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="viewMemberBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list">Manage {{userToShow.name}}</h3>
+          </div>
+        </div>
+      </div>
+      <form method="POST">
+      <button type="button" id="viewMemberKickBtn"class="btn btn-danger btn-lg btn-block">Kick {{userToShow.name}}</button>
+      </form>
+      <button type="button" id="viewMemberKickBtn"class="btn btn-secondary btn-lg btn-block">Manage {{userToShow.name}}'s role</button>
+      
+</body>

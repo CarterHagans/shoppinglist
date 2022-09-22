@@ -4,16 +4,23 @@
 <body id="homeBody">
     <h1 id="headTitle">Welcome to Carters Virtual Shopping List!</h1>
     <a href="/start">
-        <button type="button"  id="homePage_startButton">Get Started</button>
+        <button type="button"  id="homePage_startButton">Sign up</button>
     </a>
 
     <a href="/login">
         <button type="button"  id="homePage_aboutButton">Shopping List</button>
     </a>
 
+    {% if alreadyLoggedIn == False %}
     <a href="/login">
         <button type="button"  id="homePage_loginButton">Login</button>
     </a>
+
+    {% else %}
+    <a href="/login">
+        <button type="button"  id="homePage_loginButton">Get Started</button>
+    </a>
+    {% endif %}
 
 
 

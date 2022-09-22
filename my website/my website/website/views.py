@@ -8,7 +8,9 @@ import datetime
 from .models import User,Families
 from . import db
 from flask_sqlalchemy import SQLAlchemy
-
+from email.message import EmailMessage
+import ssl
+import smtplib
 
 views = Blueprint("views", __name__)
 
@@ -18,7 +20,10 @@ views = Blueprint("views", __name__)
 @views.route("/")
 @views.route("/home")
 def home():
-    return render_template("home.html")
+    alreadyLoggedIn = False
+    if session.get("username") != None:
+        alreadyLoggedIn = True
+    return render_template("home.html",alreadyLoggedIn=alreadyLoggedIn)
 
 
 
@@ -636,7 +641,7 @@ def create_family():
                     users_families.append(family_name)
                     user.families = json.dumps(users_families)
                     db.session.commit()
-            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([family_owner]),json.dumps([]),json.dumps([]),json.dumps([]),0,0,json.dumps([]),json.dumps([]))
+            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([family_owner]),json.dumps([]),json.dumps([]),json.dumps([]),0,0,json.dumps([]),json.dumps([]),json.dumps([]))
 
             db.session.add(family_to_be_created)
             db.session.commit()
@@ -689,3 +694,245 @@ def signup():
     else:
         
      return render_template("signup.html")
+
+
+@views.route('/families/<id>/member-management')
+def member_management(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        amountOfAdmins = len(adminList)
+        amountOfMembers = len(memberList)
+        memberObjects = []
+        adminObjects = []
+
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+            for member in memberList:
+                memberObjects.append(User.query.filter_by(name=member).first())
+            for admin in adminList:
+                adminObjects.append(User.query.filter_by(name=admin).first())
+            
+            return render_template("memberManagement.html",memberInfo=memberObjects,adminInfo=adminObjects,member_amount=amountOfMembers,members=memberList,admin_amount=amountOfAdmins,admins=adminList,family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner)
+        else: 
+            return redirect("/")
+        
+        
+@views.route('/families/<id>/member-management/<user_id>',methods=["POST","GET"])
+def view_user_acc(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+
+            
+            return render_template("viewMember.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,userToShow=userBeingManged)
+        else: 
+            return redirect("/")
+    elif request.method == "POST":
+        for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+
+
+@views.route('/families/<id>/member-management/invite',methods=["POST","GET"])
+def invite_user(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+            return render_template("invite_user.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner)
+        else: 
+            return redirect("/")
+        
+    elif request.method == "POST":
+        userFound = False
+        email_receiver = request.form.get("email")
+        for user in User.query.all():
+            if user.email == email_receiver:
+                userFound = True
+
+        if userFound == True:
+            adduser=True
+            newUser = True
+            notAdmin = True
+            notOwner = True
+            loaded_invited_users = json.loads(currentFamily.invited_users)
+            loaded_existing_users = json.loads(currentFamily.members)
+            loaded_admins = json.loads(currentFamily.admins)
+            
+            for user in loaded_invited_users:
+                if user == email_receiver:
+                    adduser = False
+            for user in loaded_existing_users:
+                users_db_model = User.query.filter_by(name=user).first()
+                if users_db_model.email == email_receiver:
+                    newUser = False
+            for user in loaded_admins:
+                users_db_model = User.query.filter_by(name=user).first()
+                if users_db_model.email == email_receiver:
+                    newUser = False
+            if email_receiver == currentFamily.creator_email:
+                notOwner = False
+            if adduser == True and newUser == True and notAdmin == True and notOwner == True:
+                
+                loaded_invited_users.append(email_receiver)
+                currentFamily.invited_users = json.dumps(loaded_invited_users)
+                db.session.commit()
+                sending_email = "virtualshoppinglistmanager@gmail.com"
+                password = "mgmozjfovvvpdivi"
+                subject = f"You have been invited to {currentFamily.name} on Virtual Shopping List!"
+                body = f"Hello! A user with the name {current_user} has invited you to their family {currentFamily.name} on Virtual Shopping List! Please click the link below to join their family.\n\n localhost:5000/join/{currentFamily._id}/{email_receiver}"
+                em = EmailMessage()
+                em['From'] = sending_email
+                em['To'] = email_receiver
+                em['subject'] = subject
+                em.set_content(body)
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp:
+                    smtp.login(sending_email,password)
+                    smtp.sendmail(sending_email,email_receiver,em.as_string())
+
+            
+
+            
+            
+                    
+        return redirect(f'/families/{id}/member-management')
+
+
+@views.route('/join/<id>/<email>',methods=["POST","GET"])
+def join_family(id,email):
+    currentUser = None
+    canJoin = False
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        for user in User.query.all():
+            if user.email == email:
+                currentUser = user
+        loaded_invited_users = json.loads(currentFamily.invited_users)
+        for invited_user in loaded_invited_users:
+            if invited_user == currentUser.email:
+                canJoin = True
+        if canJoin == True:
+            return render_template("auth.html")
+        else:
+            return redirect('/')
+    elif request.method == "POST":
+        canLogin = False
+        correctUser = False
+        username = request.form.get("username")
+        password = request.form.get("password")
+        for entry in User.query.all():
+            if entry.name == username and entry.password == password:
+                canLogin = True
+            if entry.name == username:
+                currentUser = entry
+        
+        if currentUser.email == email:
+            correctUser = True
+        
+
+        if canLogin == True and correctUser == True:
+            flash("You are now logged in!")
+            session['username'] = username
+            session['password'] = password
+            memberAlreadyIn = False
+            alreadyInFamily =  False
+            loaded_members = json.loads(currentFamily.members)
+            for member in loaded_members:
+                if member == username:
+                    memberAlreadyIn = True
+            loaded_family_list = json.loads(currentUser.families)
+            for family in loaded_family_list:
+                if family == currentFamily.name:
+                    alreadyInFamily = True
+            if alreadyInFamily == False and memberAlreadyIn == False:           
+                loaded_members.append(username)
+                loaded_family_list.append(currentFamily.name)
+                currentFamily.members = json.dumps(loaded_members)
+                currentUser.families = json.dumps(loaded_family_list)
+                db.session.commit()
+                return redirect("/families")
+            else:
+                return redirect('/families')
+        elif canLogin == False:
+            flash("You were not logged in, please check your username and password.")
+            return redirect("/")

@@ -29,8 +29,9 @@ class Families(db.Model):
     num_of_items_inventory = db.Column(db.Integer)
     list_audit_log = db.Column(db.String(10000))
     inventory_audit_log = db.Column(db.String(10000))
+    invited_users = db.Column(db.String(10000))
     
-    def __init__(self,name,creator_name,creator_email,members,admins,shopping_list,inventory,num_of_items_list,num_of_items_inventory,list_audit_log,inventory_audit_log):
+    def __init__(self,name,creator_name,creator_email,members,admins,shopping_list,inventory,num_of_items_list,num_of_items_inventory,list_audit_log,inventory_audit_log,invited_users):
         self.name =name
         self.creator_name = creator_name
         self.creator_email = creator_email
@@ -42,3 +43,4 @@ class Families(db.Model):
         self.num_of_items_inventory = num_of_items_inventory
         self.list_audit_log = list_audit_log
         self.inventory_audit_log = inventory_audit_log
+        self.invited_users = invited_users
