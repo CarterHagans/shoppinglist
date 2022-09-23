@@ -1154,6 +1154,7 @@ def make_user_admin(id,user_id):
                         elif current_user in currentFamily.members:
                             canAccess = True
             if canAccess == True and canManageFamily == True:
+                print(currentFamily.members)
                 return redirect(f'/families/{id}/member-management/{user_id}')
                 
                 
@@ -1209,7 +1210,75 @@ def make_user_member(id,user_id):
                         elif current_user in currentFamily.members:
                             canAccess = True
             if canAccess == True and canManageFamily == True:
+                print(currentFamily.members)
                 return redirect(f'/families/{id}/member-management/{user_id}')
+                
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+        
+        
+
+@views.route('/families/<id>/member-management/<user_id>/transfer-ownership',methods=["POST","GET"])
+def transfer_ownership(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            owner_db_model = User.query.filter_by(name=currentFamily.creator_name).first()
+            new_owner = userBeingManged
+            currentFamily.creator_name = new_owner.name
+            currentFamily.creator_email = new_owner.email
+            db.session.commit()
+            for admin in adminList:
+                if admin == new_owner.name:
+                    adminList.remove(admin)
+                    currentFamily.admins = json.dumps(adminList)
+                    db.session.commit()
+                    
+                    
+            new_list = json.loads(currentFamily.members)
+            print(new_list)
+            new_list.append(currentFamily.creator_name)
+            print(new_list)
+            currentFamily.members = json.dumps(new_list)
+            db.session.commit()
+            print(currentFamily.members)
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                return redirect(f'/families/{id}')
                 
                 
             else: 
