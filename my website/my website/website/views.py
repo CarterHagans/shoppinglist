@@ -1285,3 +1285,38 @@ def transfer_ownership(id,user_id):
                 return redirect("/")
         else:
             return redirect(f'/families/{id}/member-management/{user_id}')
+
+
+@views.route('/families/<id>/family-management',methods=["POST","GET"])
+def manage_family(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            return render_template("familyManagement.html",family=currentFamily)
+        else:
+            return redirect(f'/families/{id}')
+    elif request.method == "POST":
+        new_family_name = request.form.get("newname")
+        canCreateFamily = True
+        for family in Families.query.all():
+            if family.name == new_family_name:
+                canCreateFamily = False
+        if canCreateFamily == True:
+            currentFamily.name = new_family_name
+            db.session.commit()
+            return redirect(f'/families/{id}')
+        else:
+            return redirect(f'/families/{id}/family-management')
