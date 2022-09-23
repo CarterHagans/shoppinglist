@@ -717,6 +717,7 @@ def member_management(id):
     currentFamily = Families.query.filter_by(_id=id).first()
     if request.method == "GET":
 
+        ownerDBMODEL = User.query.filter_by(name=current_user).first()
         canAccess = False
         canManageFamily = False
         isOwner = False
@@ -750,7 +751,7 @@ def member_management(id):
             for admin in adminList:
                 adminObjects.append(User.query.filter_by(name=admin).first())
             
-            return render_template("memberManagement.html",memberInfo=memberObjects,adminInfo=adminObjects,member_amount=amountOfMembers,members=memberList,admin_amount=amountOfAdmins,admins=adminList,family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner)
+            return render_template("memberManagement.html",memberInfo=memberObjects,adminInfo=adminObjects,member_amount=amountOfMembers,members=memberList,admin_amount=amountOfAdmins,admins=adminList,family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,ownerModel=ownerDBMODEL)
         else: 
             return redirect("/")
         
@@ -983,7 +984,10 @@ def kick_user(id,user_id):
     current_user = session.get("username")
     currentFamily = Families.query.filter_by(_id=id).first()
     if request.method == "GET":
+        
+        user_db_model = User.query.filter_by(name=current_user).first()
 
+        
         canAccess = False
         canManageFamily = False
         isOwner = False
@@ -994,41 +998,221 @@ def kick_user(id,user_id):
         userIsMember = False
         loadedInvitedUsers = json.loads(currentFamily.invited_users)
 
-        if session.get("username") == None:
-            flash("You must be logged in!")
-            return redirect("/")
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        elif user_db_model.name in adminList:
+            canAccessPage= True
+        else:
+            canAccessPage = False    
+        
+        if canAccessPage == True:
+                
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
 
-        users_families = json.loads(userBeingManged.families)
+            users_families = json.loads(userBeingManged.families)
+            
+            for member in adminList:
+                if member == userBeingManged.name:
+                    userIsAdmin = True
+            
+            if userIsAdmin == False:
+                for member in memberList:
+                    if member == userBeingManged.name:
+                        userIsMember = True
+            
+            if userIsMember == True:
+                memberList.remove(userBeingManged.name)
+                currentFamily.members = json.dumps(memberList)
+                db.session.commit()
+            elif userIsAdmin == True:
+                adminList.remove(userBeingManged.name)
+                currentFamily.admins = json.dumps(adminList)
+                db.session.commit()
+            
+            for family in users_families:
+                if family == currentFamily.name:
+                    users_families.remove(family)
+            
+            for user in loadedInvitedUsers:
+                if user == userBeingManged.email:
+                    loadedInvitedUsers.remove(user)
+                    currentFamily.invited_users = json.dumps(loadedInvitedUsers)
+                    db.session.commit()
+                    
+            userBeingManged.families = json.dumps(users_families)
+            db.session.commit()
+                    
+            return redirect(f'/families/{id}/member-management')
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+
+
+@views.route('/families/<id>/member-management/<user_id>/manage-role',methods=["POST","GET"])
+def manage_user_role(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        currentRole = ""
         
-        for member in adminList:
-            if member == userBeingManged.name:
-                userIsAdmin = True
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
         
-        if userIsAdmin == False:
+        if canAccessPage == True:
+        
+            for admin in adminList:
+                if admin == userBeingManged.name:
+                    currentRole = "admin"
+                    
+                    
             for member in memberList:
                 if member == userBeingManged.name:
-                    userIsMember = True
+                    currentRole = "member"
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+
+                
+                return render_template("changeRole.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,userToShow=userBeingManged,currentRole=currentRole)
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
         
-        if userIsMember == True:
-            memberList.remove(userBeingManged.name)
-            currentFamily.members = json.dumps(memberList)
-            db.session.commit()
-        elif userIsAdmin == True:
-            adminList.remove(userBeingManged.name)
+        
+@views.route('/families/<id>/member-management/<user_id>/admin',methods=["POST","GET"])
+def make_user_admin(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            for member in memberList:
+                if member == userBeingManged.name:
+                    memberList.remove(member)
+                    currentFamily.members = json.dumps(memberList)
+                    db.session.commit()
+            
+            adminList.append(userBeingManged.name)
             currentFamily.admins = json.dumps(adminList)
             db.session.commit()
-        
-        for family in users_families:
-            if family == currentFamily.name:
-                users_families.remove(family)
-        
-        for user in loadedInvitedUsers:
-            if user == userBeingManged.email:
-                loadedInvitedUsers.remove(user)
-                currentFamily.invited_users = json.dumps(loadedInvitedUsers)
-                db.session.commit()
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
                 
-        userBeingManged.families = json.dumps(users_families)
-        db.session.commit()
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                return redirect(f'/families/{id}/member-management/{user_id}')
                 
-        return redirect(f'/families/{id}/member-management')
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+
+@views.route('/families/<id>/member-management/<user_id>/member',methods=["POST","GET"])
+def make_user_member(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            for admin in adminList:
+                if admin == userBeingManged.name:
+                    adminList.remove(admin)
+                    currentFamily.admins = json.dumps(adminList)
+                    db.session.commit()
+            
+            memberList.append(userBeingManged.name)
+            currentFamily.members = json.dumps(memberList)
+            db.session.commit()
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                return redirect(f'/families/{id}/member-management/{user_id}')
+                
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')

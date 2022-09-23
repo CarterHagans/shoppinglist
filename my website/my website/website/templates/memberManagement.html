@@ -12,35 +12,57 @@
           </div>
         </div>
       </div>
-    {% if owner == True %}
-
-    {% if admin_amount == 0 and member_amount == 0%}
-    <p id="listHead"class="h1">Something went wrong.</p>
-
-    {% else %}
-
+  
+      
+      {% if member_amount == 0 and admin_amount == 0 %}
+      <div id="test">
+        <a id="listitem" onclick="ownerBtn();"  class="list-group-item list-group-item-action">{{ownerModel.name}} (OWNER)</a>
+        </div>
+        {%endif%}
+      {% if owner == True %}
+      
       {% for admin in adminInfo %}
-
       <div id="test">
         <a id="listitem" href="/families/{{family._id}}/member-management/{{admin._id}}" class="list-group-item list-group-item-action">{{admin.name}} (ADMIN)</a>
         </div>
+      {% endfor %}
+      {% for member in memberInfo %}
+      {% if member.name == family.creator_name %}
+      <div id="test">
+        <a id="listitem" onclick="ownerBtn();"  class="list-group-item list-group-item-action">{{member.name}} (OWNER)</a>
+        </div>
+      {%else%}
+      <div id="test">
+        <a id="listitem" href="/families/{{family._id}}/member-management/{{member._id}}" class="list-group-item list-group-item-action">{{member.name}} (MEMBER)</a>
+        </div>
+        {% endif %}
         {% endfor %}
+        {% elif user_has_permissions == True %}
+
         {% for member in memberInfo %}
         {% if member.name == family.creator_name %}
         <div id="test">
-          <a id="listitem" onclick="ownerBtn();" class="list-group-item list-group-item-action">{{member.name}} (OWNER)</a>
+          <a id="listitem" onclick="ownerBtn();"  class="list-group-item list-group-item-action">{{member.name}} (OWNER)</a>
           </div>
-          {% else %}
-          <div id="test">
-            <a id="listitem" href="/families/{{family._id}}/member-management/{{member._id}}" class="list-group-item list-group-item-action">{{member.name}} (MEMBER)</a>
-            </div>
+        {%else%}
+        <div id="test">
+          <a id="listitem" href="/families/{{family._id}}/member-management/{{member._id}}" class="list-group-item list-group-item-action">{{member.name}} (MEMBER)</a>
+          </div>
           {% endif %}
           {% endfor %}
-    {% endif %}
+          {% for admin in adminInfo %}
+          <div id="test">
+            <a id="listitem" onclick="adminBtn();"  class="list-group-item list-group-item-action">{{admin.name}} (ADMIN)</a>
+            </div>
+            {%endfor%}
+          {%endif%}
 
-    {% else %}
 
-    {% endif %}
+
+
+
+
+
     <a href="/families/{{family._id}}/member-management/invite">
     <button type="button"  id="viewMemberKickBtn"class="btn btn-primary btn-lg btn-block">Invite user to {{ family.name }} </button>
     </a>
@@ -50,6 +72,9 @@
     <script>
       function ownerBtn(){
         alert("You can not edit the owner's permissions.")
+      }
+      function adminBtn(){
+        alert("You can not edit other admin's permissions.")
       }
     </script>
 </body>

@@ -1,0 +1,33 @@
+<title>Virtual Shopping List - Edit {{userToShow.name}}'s role</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="createFamilyBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list"> Change {{userToShow.name}}'s role</h3>
+            <h2>Current role: {{currentRole}}</h2>
+          </div>
+        </div>
+      </div>
+
+      {% if currentRole == "member" %}
+      <a href="/families/{{family._id}}/member-management/{{userToShow._id}}/admin">
+        <button type="button" id="viewMemberKickBtn"class="btn btn-secondary btn-lg btn-block">Make {{userToShow.name}} an admin</button>
+        </a>
+        {%elif currentRole == "admin" %}
+        <a href="/families/{{family._id}}/member-management/{{userToShow._id}}/member">
+            <button type="button" id="viewMemberKickBtn"class="btn btn-primary btn-lg btn-block">Make {{userToShow.name}} a member</button>
+            </a>
+            <a href="/families/{{family._id}}/member-management/{{userToShow._id}}/transfer-ownership">
+                <button type="button" id="viewMemberKickBtn"class="btn btn-secondary btn-lg btn-block">Transfer ownership to {{userToShow.name}}</button>
+                </a>
+        {% endif %}
+        <a href="/families/{{family._id}}/member-management/{{userToShow._id}}">
+            <button type="button" id="viewMemberKickBtn"class="btn btn-danger btn-lg btn-block">Back</button>
+            </a>
+
+</body>
