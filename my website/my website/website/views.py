@@ -42,15 +42,31 @@ def start():
 def login():
     if request.method == "POST":
         canLogin = False
+        lookForEmail = False
+        usingEmail = False
         username = request.form.get("username")
         password = request.form.get("password")
         for entry in User.query.all():
             if entry.name == username and entry.password == password:
                 canLogin = True
+        lookForEmail =True
+        if canLogin == False:
+            for entry in User.query.all():
+                if entry.email == username and entry.password == password:
+                    canLogin = True
+                    lookForEmail = False
+                    usingEmail = True
         if canLogin == True:
-            flash("You are now logged in!")
-            session['username'] = username
-            session['password'] = password
+            if usingEmail == True:
+                session['email'] = username
+                session['password'] = password
+                current_user = User.query.filter_by(email=username).first()
+                session['username'] = current_user.name
+                
+            else:
+                session['username'] = username
+                session['password'] = password
+            
             return redirect("/families")
         elif canLogin == False:
             flash("You were not logged in, please check your username and password.")
@@ -77,16 +93,15 @@ def families():
             return redirect("/")
 
         username = session.get("username") # their username is stored in their session, get their username
+        user = User.query.filter_by(name=username).first()
 
-        for user in User.query.all(): # searching for that username in the database
-            if user.name == username: # finding the user, making sure is the right user
-                families = user.families # accessing the families they are in
-                list_of_families = json.loads(families) # changing the list from a string to an actual list
-                length_of_families = len(list_of_families) # getting the amount of families they are in
-                lists_being_sent_to_page = []
-                for family in Families.query.all():
-                    if username in family.members or username in family.admins or username == family.creator_name:
-                        lists_being_sent_to_page.append(family)
+        families = user.families # accessing the families they are in
+        list_of_families = json.loads(families) # changing the list from a string to an actual list
+        length_of_families = len(list_of_families) # getting the amount of families they are in
+        lists_being_sent_to_page = []
+        for family in Families.query.all():
+            if username in family.members or username in family.admins or username == family.creator_name:
+                lists_being_sent_to_page.append(family)
 
             
 
@@ -857,7 +872,7 @@ def invite_user(id):
                 currentFamily.invited_users = json.dumps(loaded_invited_users)
                 db.session.commit()
                 sending_email = "virtualshoppinglistmanager@gmail.com"
-                password = "mgmozjfovvvpdivi"
+                password = "kdnfadoxwpxgovqz"
                 subject = f"You have been invited to {currentFamily.name} on Virtual Shopping List!"
                 body = f"Hello! A user with the name {current_user} has invited you to their family {currentFamily.name} on Virtual Shopping List! Please click the link below to join their family.\n\n localhost:5000/join/{currentFamily._id}/{email_receiver}"
                 em = EmailMessage()
@@ -866,11 +881,10 @@ def invite_user(id):
                 em['subject'] = subject
                 em.set_content(body)
                 context = ssl.create_default_context()
+
                 with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp:
                     smtp.login(sending_email,password)
                     smtp.sendmail(sending_email,email_receiver,em.as_string())
-
-            
 
             
             
@@ -898,6 +912,8 @@ def join_family(id,email):
     elif request.method == "POST":
         canLogin = False
         correctUser = False
+        usingEmail = False
+        lookForEmail = False
         username = request.form.get("username")
         password = request.form.get("password")
         for entry in User.query.all():
@@ -905,15 +921,38 @@ def join_family(id,email):
                 canLogin = True
             if entry.name == username:
                 currentUser = entry
+                
+                
+                
+        lookForEmail =True
+        if canLogin == False:
+            for entry in User.query.all():
+                if entry.email == username and entry.password == password:
+                    canLogin = True
+                    lookForEmail = False
+                    usingEmail = True
+                
+                if entry.email == username:
+                    currentUser = entry
+
+        
+        if currentUser == None:
+            return redirect("/")
         
         if currentUser.email == email:
             correctUser = True
         
 
         if canLogin == True and correctUser == True:
-            flash("You are now logged in!")
-            session['username'] = username
-            session['password'] = password
+            if usingEmail == True:
+                session['email'] = username
+                session['password'] = password
+                current_user = User.query.filter_by(email=username).first()
+                session['username'] = current_user.name
+                username = current_user.name
+            else:
+                session['username'] = username
+                session['password'] = password
             memberAlreadyIn = False
             alreadyInFamily =  False
             loaded_members = json.loads(currentFamily.members)
@@ -924,7 +963,8 @@ def join_family(id,email):
             for family in loaded_family_list:
                 if family == currentFamily.name:
                     alreadyInFamily = True
-            if alreadyInFamily == False and memberAlreadyIn == False:           
+            if alreadyInFamily == False and memberAlreadyIn == False:    
+  
                 loaded_members.append(username)
                 loaded_family_list.append(currentFamily.name)
                 currentFamily.members = json.dumps(loaded_members)
@@ -936,3 +976,59 @@ def join_family(id,email):
         elif canLogin == False:
             flash("You were not logged in, please check your username and password.")
             return redirect("/")
+
+
+@views.route('/families/<id>/member-management/<user_id>/kick',methods=["POST","GET"])
+def kick_user(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        userIsAdmin = False
+        userIsMember = False
+        loadedInvitedUsers = json.loads(currentFamily.invited_users)
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+
+        users_families = json.loads(userBeingManged.families)
+        
+        for member in adminList:
+            if member == userBeingManged.name:
+                userIsAdmin = True
+        
+        if userIsAdmin == False:
+            for member in memberList:
+                if member == userBeingManged.name:
+                    userIsMember = True
+        
+        if userIsMember == True:
+            memberList.remove(userBeingManged.name)
+            currentFamily.members = json.dumps(memberList)
+            db.session.commit()
+        elif userIsAdmin == True:
+            adminList.remove(userBeingManged.name)
+            currentFamily.admins = json.dumps(adminList)
+            db.session.commit()
+        
+        for family in users_families:
+            if family == currentFamily.name:
+                users_families.remove(family)
+        
+        for user in loadedInvitedUsers:
+            if user == userBeingManged.email:
+                loadedInvitedUsers.remove(user)
+                currentFamily.invited_users = json.dumps(loadedInvitedUsers)
+                db.session.commit()
+                
+        userBeingManged.families = json.dumps(users_families)
+        db.session.commit()
+                
+        return redirect(f'/families/{id}/member-management')
