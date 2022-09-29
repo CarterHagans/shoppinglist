@@ -1,7 +1,7 @@
 <title>Virtual Shopping List - Signup</title>
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="./static/main.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
 </head>
 
 <body id="signupBody">
@@ -15,20 +15,20 @@
 
       <form method="POST">
         <div class="form-group">
-          <label for="exampleInputEmail1">Email address</label>
-          <input name="email" required type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+          <label  id="addItemLabel1" for="exampleInputEmail1">Email address</label>
+          <input id="addItemBtn1" name="email" required type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
           <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         </div>
         <div class="form-group">
-          <label for="exampleInputPassword1">Password</label>
-          <input name="password" required type="password" minlength="5" maxlength="100" class="form-control" id="exampleInputPassword1" placeholder="Password">
+          <label id="addItemLabel1" for="exampleInputPassword1">Password</label>
+          <input id="addItemBtn1" name="password" required type="password" minlength="5" maxlength="100" class="form-control" id="exampleInputPassword1" placeholder="Password">
         </div>
         <div class="form-group">
-            <label for="exampleUsername">Username</label>
-            <input name="username" required type="text" class="form-control" minlength="5" maxlength= "25"id="exampleUsername" placeholder="Username">
+            <label id="addItemLabel1" for="exampleUsername">Username</label>
+            <input id="addItemBtn1" name="username" required type="text" class="form-control" minlength="5" maxlength= "25"id="exampleUsername" placeholder="Username">
             <small id="emailHelp" class="form-text text-muted">This is how family members will find you on our site.</small>
           </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button id="addItemSubmitBtn"type="submit" class="btn btn-primary">Submit</button>
       </form>
 
 

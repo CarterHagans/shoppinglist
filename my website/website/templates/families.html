@@ -17,19 +17,27 @@
         if you want to join an already existing family, please have the owner of the family or an admin of the family invite you. Once they invite you, 
         you will receive an email with more information.
       </h2>
+      <a href="/dashboard">
+        <button type="button" class="btn btn-danger"  id="familiesBackBtn">Back to dashboard</button>
+      </a>
       <a href="/create-family">
-        <button id="createFamilyBtn"type="button" class="btn btn-primary btn-lg">Create Family</button>
+      <button type="submit" class="btn btn-primary " id="createFamilylink">Create new family</button>
       </a>
 
       {% else %}
       <div class="list-group"></div>
       {% for family in users_families %}
-      <a href="/families/{{family._id}}" class="list-group-item list-group-item-action">{{  family.name  }}</a>
+      <a href="/families/{{family._id}}" id="familyLabel" class="list-group-item list-group-item-action">{{  family.name  }}</a>
       {% endfor %}
-      <a href="/create-family">
-      <button type="submit" class="btn btn-primary" id="createFamilylink">Create new family</button>
+      <a href="/dashboard">
+        <button type="button" class="btn btn-danger"  id="familiesBackBtn">Back to dashboard</button>
       </a>
+      <a href="/create-family">
+      <button type="submit" class="btn btn-primary " id="createFamilylink">Create new family</button>
+      </a>
+      
       {% endif %}
+
 
 
 

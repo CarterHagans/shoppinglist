@@ -1,0 +1,38 @@
+<title>Virtual Shopping List Dashboard</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="listBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list"> DASHBOARD</h3>
+          </div>
+        </div>
+      </div>
+
+      <a href="/families">
+        <button id="dashboardBtn1" type="button" class="btn btn-secondary btn-lg btn-block">View your families</button>
+      </a>
+      <a href="/my-profile">
+        <button id="dashboardBtn2" type="button" class="btn btn-secondary btn-lg btn-block">Your profile</button>
+      </a>
+
+      <a href="/add-friend">
+        <button id="dashboardBtn3" type="button" class="btn btn-secondary btn-lg btn-block">Add friend</button>
+      </a>
+      <a href="/manage-friends">
+        <button id="dashboardBtn4" type="button" class="btn btn-secondary btn-lg btn-block">Manage friends</button>
+      </a>
+      <a href="/messages">
+        <button id="dashboardBtn5" type="button" class="btn btn-secondary btn-lg btn-block">Messaging Platform</button>
+      </a>
+      <a href="/">
+        <button id="dashboardBtn6" type="button" class="btn btn-danger btn-lg btn-block">Back to home page</button>
+      </a>
+
+
+
+    </body>

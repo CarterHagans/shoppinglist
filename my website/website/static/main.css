@@ -1,47 +1,25 @@
 /* ---------------------- Start of Home.html styles ---------------------- */
 
 #homeBody {
-    -webkit-animation: background 5s cubic-bezier(1,0,0,1) infinite;
-    animation: background 5s cubic-bezier(1,0,0,1) infinite;  
+      -webkit-animation: background 5s cubic-bezier(1,0,0,1) infinite;
+      animation: background 5s cubic-bezier(1,0,0,1) infinite;  
+      margin: 0; 
+      padding: 0
 }
 
 #homePage_startButton{
-    position: relative;
-    width: 300px;
-    height: 100px;
-    left: 500px;
-    top: 50px;
-    border: 1.7px solid black;
-    font-size: 2vw;
-    font-family:cursive;
-    font-weight: bolder;
+    
     -webkit-animation: bounce .3s infinite alternate;
     -moz-animation: bounce .3s infinite alternate;
     animation: bounce .3s infinite alternate;
 }
 
 #homePage_aboutButton{
-    position: relative;
-    width: 300px;
-    height: 100px;
-    left: 195px;
-    top: 200px;
-    border: 1.7px solid black;
-    font-size: 2vw;
-    font-family:cursive;
-    font-weight: bolder;
+
 }
 
 #homePage_loginButton{
-    position: relative;
-    width: 300px;
-    height: 100px;
-    left: -110px;
-    top: 350px;
-    border: 1.7px solid black;
-    font-size: 2vw;
-    font-family:cursive;
-    font-weight: bolder;
+
 }
 
 #homePage_aboutButton:hover{
@@ -65,11 +43,411 @@
 }
 
 #headTitle{
-    text-align: center;
-    color: white;
-    font-size: 4vw;
-    font-family: cursive;
-    font-weight: bolder;
+  padding: 50px 50px 100px 70px;
+  font-family:fantasy;
+  font-size: 50px;
+  color: black;
+  line-height: 50px;
+}
+
+@media only screen and (min-width:200px){
+  #headTitle{
+    padding: 50px 50px 100px 100px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 325px;
+    height: 75px;
+    position: relative;
+    left: 40px;
+    font-size: 40px;
+    top: -50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 325px;
+    height: 75px;
+    position: relative;
+    left: 40px;
+    font-size: 40px;
+    top: -10px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 325px;
+    height: 75px;
+    position: relative;
+    left: 40px;
+    font-size: 40px;
+    top: 30px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:768px){
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 175px;
+    font-size: 40px;
+    top: -50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 175px;
+    font-size: 40px;
+    top: -10px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 175px;
+    font-size: 40px;
+    top: 30px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1000px){
+  #headTitle{
+    padding: 50px 50px 100px 200px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 525px;
+    height: 125px;
+    position: relative;
+    left: 235px;
+    font-size: 40px;
+    top: -50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 525px;
+    height: 125px;
+    position: relative;
+    left: 235px;
+    font-size: 40px;
+    top: -10px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 525px;
+    height: 125px;
+    position: relative;
+    left: 235px;
+    font-size: 40px;
+    top: 30px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #headTitle{
+    padding: 50px 50px 100px 140px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 435px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 0px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 425px;
+    font-size: 40px;
+    top: 100px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1380px){
+  #headTitle{
+    padding: 50px 50px 100px 200px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 485px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 50px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: -375px;
+    font-size: 40px;
+    top: 200px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1480px){
+  #headTitle{
+    padding: 50px 50px 100px 240px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+}
+
+@media only screen and (min-width:1580px){
+  #headTitle{
+    padding: 50px 50px 100px 280px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 535px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 100px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: -325px;
+    font-size: 40px;
+    top: 200px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1680px){
+  #headTitle{
+    padding: 50px 50px 100px 320px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 585px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 150px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: -275px;
+    font-size: 40px;
+    top: 200px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1780px){
+  #headTitle{
+    padding: 50px 50px 100px 360px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 635px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 200px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: -225px;
+    font-size: 40px;
+    top: 200px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+}
+
+@media only screen and (min-width:1880px){
+  #headTitle{
+    padding: 50px 50px 100px 400px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+}
+
+@media only screen and (min-width:1980px){
+  #headTitle{
+    padding: 50px 50px 100px 440px;
+    font-family:fantasy;
+    font-size: 65px;
+    color: black;
+    line-height: 60px;
+  }
+  #homePage_startButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 735px;
+    font-size: 40px;
+    top: -90px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_aboutButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: 300px;
+    font-size: 40px;
+    top: 50px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
+  #homePage_loginButton{
+    width: 425px;
+    height: 100px;
+    position: relative;
+    left: -125px;
+    font-size: 40px;
+    top: 200px;
+    background-color: black;
+    border:white;
+    color:white;
+  }
 }
 
 /* ---------------------- End of Home.html styles ---------------------- */
@@ -107,7 +485,93 @@
     font-weight: bolder;
 }
 
+@media only screen and (min-width:200px){
+  .startHeaderElements span{
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
 
+  }
+  #startDesc{
+    font-size: 40px;
+    position: relative;
+    left: -50px;
+    top: 300px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+  .startHeaderElements span{
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+
+  }
+  #startDesc{
+    font-size: 20px;
+    position: relative;
+    left: -50px;
+    top: 200px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  .startHeaderElements span{
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+
+  }
+  #startDesc{
+    font-size: 20px;
+    position: relative;
+    left: -140px;
+    top: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+  .startHeaderElements span{
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+
+  }
+  #startDesc{
+    font-size: 20px;
+    position: relative;
+    left: -140px;
+    top: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
 
 /* ---------------------- End of Start.html styles ---------------------- */
 /* ---------------------- Start of signup.html styles ---------------------- */
@@ -136,6 +600,49 @@
 
 
 
+@media only screen and (min-width:200px){
+
+}
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+
+}
+
+@media only screen and (min-width:1280px){
+
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
 
 /* ---------------------- End of signup.html styles ---------------------- */
 /* ---------------------- Start of families.html styles ---------------------- */
@@ -166,17 +673,248 @@
   text-align: center;
 }
 
-#createFamilyBtn{
-  position: relative;
-  left: 550px;
-  top: 75px;
+.animate-charcter
+{
+   text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 100px;
 }
 
-#createFamilylink{
-  position: relative;
-  left: 550px;
-  top: 20px;
+
+
+@media only screen and (min-width:200px){
+  #familyLabel{
+    height: 100px;
+    font-size: 50px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 100px;
+    font-size: 40px;
+    position: relative;
+    left: 280px;
+    top: 200px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 100px;
+    font-size: 40px;
+    position: relative;
+    left: -120px;
+    top: 50px;
+  }
 }
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 330px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: -75px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 430px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 30px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1380px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 530px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 130px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1480px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 580px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 180px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1580px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 630px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 230px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1680px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 680px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 280px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1780px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 730px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 330px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1880px){
+  #familyLabel{
+    height: 50px;
+    font-size: 25px;
+  }
+  #familiesBackBtn{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 780px;
+    top: 150px;
+  }
+  #createFamilylink{
+    width: 400px;
+    height: 40px;
+    font-size: 20px;
+    position: relative;
+    left: 380px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+
+
 /* ---------------------- End of families.html styles ---------------------- */
 
 
@@ -223,7 +961,1448 @@
   font-family: cursive;
 }
 
+
+@media only screen and (min-width:200px){
+#listBtn1{
+  height: 125px;
+  font-size: 60px;
+  font-weight: bolder;
+  position: relative;
+  top: 70px;
+}
+#listBtn2{
+  height: 125px;
+  font-size: 60px;
+  font-weight: bolder;
+  position: relative;
+  top: 120px;
+}
+#listBtn3{
+  height: 125px;
+  font-size: 60px;
+  font-weight: bolder;
+  position: relative;
+  top: 170px;
+}
+#editbtn{
+  height: 75px;
+  font-size: 30px;
+  font-weight: bolder;
+  position: relative;
+  top: 20px;
+  left: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+}
+#removebtn{
+  height: 75px;
+  font-size: 30px;
+  font-weight: bolder;
+  position: relative;
+  top: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+}
+#listitem{
+  cursor:default;
+  height: 125px;
+  font-size: 60px;
+  position: relative;
+  top: 20px;
+  
+}
+
+}
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+  #listBtn1{
+    height: 75px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 70px;
+  }
+  #listBtn2{
+    height: 75px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 120px;
+  }
+  #listBtn3{
+    height: 75px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 170px;
+  }
+  #editbtn{
+    height: 55px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+    left: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+  }
+  #removebtn{
+    height: 55px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+  }
+  #listitem{
+    cursor:default;
+    height: 75px;
+    font-size: 30px;
+    position: relative;
+    top: 20px;
+    
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #listBtn1{
+    height: 55px;
+    font-size: 20px;
+    font-weight: bolder;
+    position: relative;
+    top: 50px;
+  }
+  #listBtn2{
+    height: 55px;
+    font-size: 20px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+  }
+  #listBtn3{
+    height: 55px;
+    font-size: 20px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+  }
+  #editbtn{
+    height: 35px;
+    font-size: 15px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+    left: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+  }
+  #removebtn{
+    height: 35px;
+    font-size: 15px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+  }
+  #listitem{
+    cursor:default;
+    height: 55px;
+    font-size: 20px;
+    position: relative;
+    top: 20px;
+    
+  }
+}
+
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+
+
+
 /* ---------------------- End of list.html styles ---------------------- */
+
+
+/* ---------------------- Start of view_family.html styles ---------------------- */
+
+@media only screen and (min-width:200px){
+  #viewFamilyBtn1{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+  }
+  #viewFamilyBtn2{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 40px;
+  }
+  #viewFamilyBtn3{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 60px;
+  }
+  #viewFamilyBtn4{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 80px;
+  }
+  #viewFamilyBtn5{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+  }
+}
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+  #viewFamilyBtn1{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+  }
+  #viewFamilyBtn2{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 40px;
+  }
+  #viewFamilyBtn3{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 60px;
+  }
+  #viewFamilyBtn4{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 80px;
+  }
+  #viewFamilyBtn5{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #viewFamilyBtn1{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+  }
+  #viewFamilyBtn2{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 40px;
+  }
+  #viewFamilyBtn3{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 60px;
+  }
+  #viewFamilyBtn4{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 80px;
+  }
+  #viewFamilyBtn5{
+    height: 60px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+  }
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+  #viewFamilyBtn1{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 20px;
+  }
+  #viewFamilyBtn2{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 40px;
+  }
+  #viewFamilyBtn3{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 60px;
+  }
+  #viewFamilyBtn4{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 80px;
+  }
+  #viewFamilyBtn5{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+  }
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+/* ---------------------- End of list.html styles ---------------------- */
+/* ---------------------- Start of add_item_list.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+  #addItemBtn1{
+    height: 150px;
+    font-size: 60px;
+  }
+  #addItemLabel1{
+    font-size: 60px;
+  }
+  #addItemLabel2{
+    font-size: 60px;
+  }
+  #addItemBtn2{
+    height: 150px;
+    font-size: 60px;
+  }
+  #addItemSubmitBtn{
+    height: 100px;
+    font-size: 60px;
+    width: 300px;
+    position: relative;
+    left: 325px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:768px){
+
+}
+
+@media only screen and (min-width:1000px){
+  #addItemBtn1{
+    height: 100px;
+    font-size: 30px;
+  }
+  #addItemLabel1{
+    font-size: 30px;
+  }
+  #addItemLabel2{
+    font-size: 30px;
+  }
+  #addItemBtn2{
+    height: 100px;
+    font-size: 30px;
+  }
+  #addItemSubmitBtn{
+    height: 100px;
+    font-size: 60px;
+    width: 300px;
+    position: relative;
+    left: 350px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 500px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1380px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 550px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1480px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 600px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1580px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 650px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1680px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 700px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1780px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 750px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1880px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 800px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1980px){
+  #addItemBtn1{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemLabel1{
+    font-size: 20px;
+  }
+  #addItemLabel2{
+    font-size: 20px;
+  }
+  #addItemBtn2{
+    height: 80px;
+    font-size: 20px;
+  }
+  #addItemSubmitBtn{
+    height: 80px;
+    font-size: 40px;
+    width: 300px;
+    position: relative;
+    left: 850px;
+    top: 50px;
+  }
+}
+
+/* ---------------------- End of add_item_list.html styles ---------------------- */
+/* ---------------------- Start of list_auditlog.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+  #audititem{
+    height: 225px;
+    font-size: 40px;
+  }
+  #auditbtn{
+    height: 150px;
+    font-size: 40px;
+    position: relative;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:768px){
+  #audititem{
+    height: 125px;
+    font-size: 30px;
+  }
+  #auditbtn{
+    height: 90px;
+    font-size: 40px;
+    position: relative;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1000px){
+  #audititem{
+    height: 85px;
+    font-size: 20px;
+  }
+  #auditbtn{
+    height: 60px;
+    font-size: 30px;
+    position: relative;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1280px){
+
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+
+
+/* ---------------------- End of list_auditlog.html styles ---------------------- */
+/* ---------------------- Start of dashboard.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+  #dashboardBtn1{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 50px;
+
+  }
+  #dashboardBtn2{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+
+  }
+  #dashboardBtn3{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+
+  }
+
+  #dashboardBtn4{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 200px;
+
+  }
+
+  #dashboardBtn5{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 250px;
+
+  }
+
+  #dashboardBtn6{
+    height: 150px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 300px;
+
+  }
+}
+
+@media only screen and (min-width:768px){
+  #dashboardBtn1{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 50px;
+
+  }
+  #dashboardBtn2{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+
+  }
+  #dashboardBtn3{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+
+  }
+
+  #dashboardBtn4{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 200px;
+
+  }
+
+  #dashboardBtn5{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 250px;
+
+  }
+
+  #dashboardBtn6{
+    height: 100px;
+    font-size: 50px;
+    font-weight: bolder;
+    position: relative;
+    top: 300px;
+
+  }
+}
+
+@media only screen and (min-width:1000px){
+  #dashboardBtn1{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 50px;
+
+  }
+  #dashboardBtn2{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+
+  }
+  #dashboardBtn3{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+
+  }
+
+  #dashboardBtn4{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 200px;
+
+  }
+
+  #dashboardBtn5{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 250px;
+
+  }
+
+  #dashboardBtn6{
+    height: 70px;
+    font-size: 35px;
+    font-weight: bolder;
+    position: relative;
+    top: 300px;
+
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #dashboardBtn1{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 50px;
+
+  }
+  #dashboardBtn2{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 75px;
+
+  }
+  #dashboardBtn3{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 100px;
+
+  }
+
+  #dashboardBtn4{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 125px;
+
+  }
+
+  #dashboardBtn5{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+
+  }
+
+  #dashboardBtn6{
+    height: 50px;
+    font-size: 25px;
+    font-weight: bolder;
+    position: relative;
+    top: 175px;
+
+  }
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+
+
+#viewMemberKickBtn{
+  height: 150px;
+  position: relative;
+  top: 100px;
+  font-size: 60px;
+}
+#viewMemberKickBtn2{
+  height: 150px;
+  position: relative;
+  top: 300px;
+  font-size: 60px;
+}
+
+
+/* ---------------------- End of dashboard.html styles ---------------------- */
+/* ---------------------- Start of profile.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+  #profileLabel1{
+    font-size: 60px;
+    text-align: center;
+  }
+  #profileLabel2{
+    font-size: 60px;
+    text-align: center;
+    position: relative;
+    top: 20px;
+  }
+  #profileLabel3{
+    font-size: 60px;
+    text-align: center;
+    position: relative;
+    top: 40px;
+  }
+  #profileLabel4{
+    font-size: 60px;
+    text-align: center;
+    position: relative;
+    top: 60px;
+  }
+  #editBioBtn{
+    height: 125px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 200px;
+  }
+  #profileBackToDashBtn{
+    height: 125px;
+    font-size: 60px;
+    font-weight: bolder;
+    position: relative;
+    top: 300px;
+  }
+}
+
+@media only screen and (min-width:768px){
+ 
+
+}
+
+@media only screen and (min-width:1000px){
+  #profileLabel1{
+    font-size: 40px;
+    text-align: center;
+  }
+  #profileLabel2{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 20px;
+  }
+  #profileLabel3{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 40px;
+  }
+  #profileLabel4{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 60px;
+  }
+  #editBioBtn{
+    height: 75px;
+    font-size: 40px;
+    font-weight: bolder;
+    position: relative;
+    top: 200px;
+  }
+  #profileBackToDashBtn{
+    height: 75px;
+    font-size: 40px;
+    font-weight: bolder;
+    position: relative;
+    top: 250px;
+  }
+}
+
+@media only screen and (min-width:1280px){
+  #profileLabel1{
+    font-size: 40px;
+    text-align: center;
+  }
+  #profileLabel2{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 20px;
+  }
+  #profileLabel3{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 40px;
+  }
+  #profileLabel4{
+    font-size: 40px;
+    text-align: center;
+    position: relative;
+    top: 60px;
+  }
+  #editBioBtn{
+    height: 55px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 150px;
+  }
+  #profileBackToDashBtn{
+    height: 55px;
+    font-size: 30px;
+    font-weight: bolder;
+    position: relative;
+    top: 180px;
+  }
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+
+}
+
+@media only screen and (min-width:1780px){
+
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
+
+
+
+/* ---------------------- End of profile.html styles ---------------------- */
+/* ---------------------- Start of editBio.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+#editBioArea{
+  width: 800px;
+  height: 600px;
+  background-color: black;
+  border: 10px solid rgb(169, 235, 255);
+  color: rgb(169, 235, 255);
+  font-size: 40px;
+  position: relative;
+  left: 100px;
+  top: 100px;
+}
+}
+
+@media only screen and (min-width:768px){
+ 
+
+}
+
+@media only screen and (min-width:1000px){
+
+}
+
+@media only screen and (min-width:1280px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 250px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1380px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 300px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1480px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 350px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1580px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 400px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1680px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 450px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1780px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 500px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1880px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 550px;
+    top: 50px;
+  }
+}
+
+@media only screen and (min-width:1980px){
+  #editBioArea{
+    width: 800px;
+    height: 400px;
+    background-color: black;
+    border: 10px solid rgb(169, 235, 255);
+    color: rgb(169, 235, 255);
+    font-size: 40px;
+    position: relative;
+    left: 600px;
+    top: 50px;
+  }
+}
+
+
+
+/* ---------------------- End of editBio.html styles ---------------------- */
+/* ---------------------- Start of add_friend.html styles ---------------------- */
+
+
+@media only screen and (min-width:200px){
+#addFriendSearchInput{
+  width: 550px;
+  height: 100px;
+  font-size: 30px;
+  position: relative;
+  left: 100px;
+}
+#addFriendSubmitBtn{
+  width: 200px;
+  height: 100px;
+  position: relative;
+  top: 5px;
+  left: 150px;
+  font-size: 40px;
+  background-color: black;
+  color: white;
+  font-weight: bolder;
+}
+}
+  
+  @media only screen and (min-width:768px){
+    #addFriendSearchInput{
+      width: 450px;
+      height: 50px;
+      font-size: 20px;
+      position: relative;
+      left: 200px;
+    }
+    #addFriendSubmitBtn{
+      width: 100px;
+      height: 50px;
+      position: relative;
+      top: 5px;
+      left: 250px;
+      font-size: 20px;
+      background-color: black;
+      color: white;
+      font-weight: bolder;
+    }
+  
+  }
+  
+@media only screen and (min-width:1000px){
+  #addFriendSearchInput{
+    width: 450px;
+    height: 50px;
+    font-size: 20px;
+    position: relative;
+    left: 200px;
+  }
+  #addFriendSubmitBtn{
+    width: 100px;
+    height: 50px;
+    position: relative;
+    top: 5px;
+    left: 250px;
+    font-size: 20px;
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+  }
+
+}
+
+@media only screen and (min-width:1280px){
+  #addFriendSearchInput{
+    width: 450px;
+    height: 50px;
+    font-size: 20px;
+    position: relative;
+    left: 400px;
+  }
+  #addFriendSubmitBtn{
+    width: 100px;
+    height: 50px;
+    position: relative;
+    top: 0px;
+    left: 450px;
+    font-size: 20px;
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+  }
+}
+
+@media only screen and (min-width:1380px){
+
+}
+
+@media only screen and (min-width:1480px){
+  #addFriendSearchInput{
+    width: 450px;
+    height: 50px;
+    font-size: 20px;
+    position: relative;
+    left: 500px;
+  }
+  #addFriendSubmitBtn{
+    width: 100px;
+    height: 50px;
+    position: relative;
+    top: 0px;
+    left: 550px;
+    font-size: 20px;
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+  }
+}
+
+@media only screen and (min-width:1580px){
+
+}
+
+@media only screen and (min-width:1680px){
+  #addFriendSearchInput{
+    width: 450px;
+    height: 50px;
+    font-size: 20px;
+    position: relative;
+    left: 600px;
+  }
+  #addFriendSubmitBtn{
+    width: 100px;
+    height: 50px;
+    position: relative;
+    top: 0px;
+    left: 650px;
+    font-size: 20px;
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+  }
+}
+
+@media only screen and (min-width:1780px){
+  #addFriendSearchInput{
+    width: 450px;
+    height: 50px;
+    font-size: 20px;
+    position: relative;
+    left: 700px;
+  }
+  #addFriendSubmitBtn{
+    width: 100px;
+    height: 50px;
+    position: relative;
+    top: 0px;
+    left: 750px;
+    font-size: 20px;
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+  }
+}
+
+@media only screen and (min-width:1880px){
+
+}
+
+@media only screen and (min-width:1980px){
+
+}
+
 
 /* ---------------------- Start of animations---------------------- */  
 @-webkit-keyframes bounce {

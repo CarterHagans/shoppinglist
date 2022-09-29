@@ -13,36 +13,21 @@
         </div>
       </div>
 
-
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    {% block body %}{% endblock %}
-    
       <form method="POST">
 
 
         <div class="form-group">
-            <label id="addItemLabel1" for="exampleUsername">Username or email</label>
-            <input id="addItemBtn1" name="username" required type="text" class="form-control" minlength="5" maxlength= "250"id="exampleUsername" placeholder="Username">
+            <label for="exampleUsername">Username or email</label>
+            <input name="username" required type="text" class="form-control" minlength="5" maxlength= "250"id="exampleUsername" placeholder="Username">
             <small id="emailHelp" class="form-text text-muted">You are able to enter either your username or your email to login to your account.</small>
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1" id="addItemLabel1">Password</label>
-            <input   name="password" id="addItemBtn1" required type="password" minlength="5" maxlength="100" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            <label for="exampleInputPassword1">Password</label>
+            <input name="password" required type="password" minlength="5" maxlength="100" class="form-control" id="exampleInputPassword1" placeholder="Password">
           </div>
-        <button  id="addItemSubmitBtn" type="submit" class="btn btn-primary">Login</button>
-
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
-      <a href="/forgot-password">
-        <button id="addItemSubmitBtn" class="btn btn-secondary">Forgot password?</button>
-        </a>
+
 
       <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

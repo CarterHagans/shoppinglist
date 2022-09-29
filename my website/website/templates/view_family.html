@@ -11,20 +11,23 @@
             <h3 class="animate-families"> {{ family.name }}</h3>
             <p class="h1">Owned by: {{ family.creator_name }}</p>
             <a href="/families/{{family._id}}/list">
-            <button type="button" class="btn btn-secondary btn-lg btn-block">Shopping List</button>
+            <button  id="viewFamilyBtn1" type="button" class="btn btn-secondary btn-lg btn-block">Shopping List</button>
             </a>
-            <a hef="/families/{{family._id}}/inventory">
-            <button type="button" class="btn btn-secondary btn-lg btn-block">Inventory</button>
+            <a href="/families/{{family._id}}/inventory">
+              <button  id="viewFamilyBtn2" type="button" class="btn btn-secondary btn-lg btn-block">Inventory</button>
             </a>
 
             {% if user_has_permissions == True %}
             <a href="/families/{{family._id}}/member-management">
-            <button type="button" class="btn btn-secondary btn-lg btn-block">Member Management</button>
+            <button  id="viewFamilyBtn3"type="button" class="btn btn-secondary btn-lg btn-block">Member Management</button>
             </a>
             <a href="/families/{{family._id}}/family-management">
-            <button type="button" class="btn btn-secondary btn-lg btn-block">Family Management</button>
+            <button type="button" id="viewFamilyBtn4"class="btn btn-secondary btn-lg btn-block">Family Management</button>
             </a>
             {% endif %}
+            <a href="/families">
+              <button type="button" id="viewFamilyBtn5" class="btn btn-danger btn-lg btn-block">Back to your families</button>
+              </a>
           </div>
         </div>
       </div>

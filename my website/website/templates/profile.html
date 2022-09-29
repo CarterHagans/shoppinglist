@@ -1,0 +1,25 @@
+<title>Virtual Shopping List Dashboard</title>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+</head>
+
+<body id="listBody">
+    <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h3 class="animate-list"> Your profile</h3>
+          </div>
+        </div>
+      </div>
+      <h1 id="profileLabel1">Your user id: {{user._id}}</h1>
+      <h1 id="profileLabel2">Your username: {{user.name}}</h1>
+      <h1 id="profileLabel3">Your email: {{user.email}}</h1>
+      <h1 id="profileLabel4">Your bio: {{user.bio}}</h1>
+      <a href="/users/{{user._id}}/edit-bio">
+        <button id="editBioBtn" class="btn btn-secondary btn-lg btn-block">Edit bio</button>
+      </a>
+      <a href="/dashboard">
+        <button id="profileBackToDashBtn" class="btn btn-danger btn-lg btn-block">Back to dashboard</button>
+      </a>
+

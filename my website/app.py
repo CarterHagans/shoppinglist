@@ -18,8 +18,8 @@ if __name__ == "__main__":
                                     endpoint, filename)
                 values['q'] = int(os.stat(file_path).st_mtime)
         return url_for(endpoint, **values)
-    override_url_for()  
-    app.run(debug=True, ) 
+    override_url_for()
+    app.run(debug=True, host="localhost",port=5000) # change this to local host when working locally and 185.211.4.18 with a port of 8000 when pushing to server
 
 
 

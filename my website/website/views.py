@@ -2,12 +2,15 @@ from inspect import currentframe
 import json
 from operator import truediv
 from pkgutil import iter_modules
+from re import L
 from flask import Blueprint, render_template, request,flash,redirect,session,url_for
-import time
+import datetime
 from .models import User,Families
 from . import db
 from flask_sqlalchemy import SQLAlchemy
-
+from email.message import EmailMessage
+import ssl
+import smtplib
 
 views = Blueprint("views", __name__)
 
@@ -17,7 +20,10 @@ views = Blueprint("views", __name__)
 @views.route("/")
 @views.route("/home")
 def home():
-    return render_template("home.html")
+    alreadyLoggedIn = False
+    if session.get("username") != None:
+        alreadyLoggedIn = True
+    return render_template("home.html",alreadyLoggedIn=alreadyLoggedIn)
 
 
 
@@ -36,21 +42,41 @@ def start():
 def login():
     if request.method == "POST":
         canLogin = False
+        lookForEmail = False
+        usingEmail = False
         username = request.form.get("username")
         password = request.form.get("password")
         for entry in User.query.all():
             if entry.name == username and entry.password == password:
                 canLogin = True
+        lookForEmail =True
+        if canLogin == False:
+            for entry in User.query.all():
+                if entry.email == username and entry.password == password:
+                    canLogin = True
+                    lookForEmail = False
+                    usingEmail = True
         if canLogin == True:
-            flash("You are now logged in!")
-            session['username'] = username
-            session['password'] = password
-            return redirect("/families")
+            if usingEmail == True:
+                session['email'] = username
+                session['password'] = password
+                current_user = User.query.filter_by(email=username).first()
+                session['username'] = current_user.name
+                
+            else:
+                session['username'] = username
+                session['password'] = password
+            
+            return redirect("/dashboard")
         elif canLogin == False:
             flash("You were not logged in, please check your username and password.")
             return redirect("/login")
-    else:
-        return render_template("login.html")
+    elif request.method == "GET":
+        if session.get("username") != None:
+            return redirect('/dashboard')
+        else:
+            
+            return render_template("login.html")
 
 
 
@@ -67,16 +93,15 @@ def families():
             return redirect("/")
 
         username = session.get("username") # their username is stored in their session, get their username
+        user = User.query.filter_by(name=username).first()
 
-        for user in User.query.all(): # searching for that username in the database
-            if user.name == username: # finding the user, making sure is the right user
-                families = user.families # accessing the families they are in
-                list_of_families = json.loads(families) # changing the list from a string to an actual list
-                length_of_families = len(list_of_families) # getting the amount of families they are in
-                lists_being_sent_to_page = []
-                for family in Families.query.all():
-                    if username in family.members or username in family.admins or username == family.creator_name:
-                        lists_being_sent_to_page.append(family)
+        families = user.families # accessing the families they are in
+        list_of_families = json.loads(families) # changing the list from a string to an actual list
+        length_of_families = len(list_of_families) # getting the amount of families they are in
+        lists_being_sent_to_page = []
+        for family in Families.query.all():
+            if username in family.members or username in family.admins or username == family.creator_name:
+                lists_being_sent_to_page.append(family)
 
             
 
@@ -102,11 +127,12 @@ def view_family(id):
             current_user = session.get("username")
             for user in User.query.all():
                 if user.name == current_user:
-                    if current_user in currentFamily.members:
-                        canAccess = True
-                    elif current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
                         canAccess = True
                         canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+
         if canAccess == True:
             
             return render_template("view_family.html",family=currentFamily,user_has_permissions=canManageFamily)
@@ -115,7 +141,243 @@ def view_family(id):
 
 
 
+@views.route('/families/<id>/inventory')
+def family_inventory(id):
+    if request.method == "GET": 
+        canAccess = False
+        canManageFamily = False
+        currentFamily = Families.query.filter_by(_id=id).first()
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            current_user = session.get("username")
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+                
+        if canAccess == True:
+            lengthOfInventory = len(json.loads(currentFamily.inventory))
+            families_inventory = json.loads(currentFamily.inventory)
+            
+            return render_template("inventory.html",inventory=families_inventory,family=currentFamily,user_has_permissions=canManageFamily,length_of_list=lengthOfInventory)
+        else: 
+            return redirect("/")   
 
+@views.route('/families/<id>/inventory/add',methods=["POST","GET"])
+def add_item_to_inventory(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True:
+            return render_template("add_item_inventory.html",family=currentFamily,user_has_permissions=canManageFamily)
+        else: 
+            return redirect("/")
+    elif request.method == "POST":
+        name_of_item = request.form.get("item_name")
+        amount_of_item = int(request.form.get("quantity"))
+        converted_list = json.loads(currentFamily.inventory)
+        length_of_existing_list = currentFamily.num_of_items_inventory
+        for x in range(amount_of_item):
+            converted_list.append(name_of_item +f" :{length_of_existing_list}")
+            length_of_existing_list +=1
+        completed_list = json.dumps(converted_list)
+        currentAuditLog = json.loads(currentFamily.inventory_audit_log)
+        current_time = datetime.datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        currentAuditLog.append(f'{formatted_time}: {current_user} has added {amount_of_item} of {name_of_item}(s)')
+        currentFamily.inventory_audit_log = json.dumps(currentAuditLog)
+
+
+        currentFamily.inventory = completed_list
+        currentFamily.num_of_items_inventory = length_of_existing_list
+        db.session.commit()
+        
+        return redirect(f"/families/{id}/inventory")
+
+
+
+
+@views.route('/families/<id>/inventory/remove/<item_id>',methods=["POST","GET"])
+def remove_item_from_inventory(id,item_id):
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        auditLogItem = None
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            current_user = session.get("username")
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and  canManageFamily == True:
+            families_list = json.loads(currentFamily.inventory)
+            for item in families_list:
+                if item.split(':',1)[1] == item_id:
+                    families_list.remove(item)
+                    auditLogItem = item.split(':',1)[0]
+            currentAuditLog = json.loads(currentFamily.inventory_audit_log)
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog.append(f'{formatted_time}: {current_user} has removed {auditLogItem} from the inventory ')
+            currentFamily.inventory_audit_log = json.dumps(currentAuditLog)
+            currentFamily.inventory = json.dumps(families_list)
+            db.session.commit()
+            return redirect(f'/families/{id}/inventory')
+        else:
+            return redirect(f'/families/{id}/inventory')
+    return redirect(f"/families/{id}/inventory")
+
+
+@views.route('/families/<id>/inventory/edit/<item_id>',methods=["POST","GET"])
+def edit_inventory_item(id,item_id):
+    currentFamily = Families.query.filter_by(_id=id).first()
+    current_user = session.get("username")
+    if request.method == "GET":
+
+        canAccess = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+
+
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.members:
+
+                        canAccess = True
+
+        if canAccess == True:
+            item_to_send = None
+            quantity = 0
+            for item in json.loads(currentFamily.inventory):
+                
+                if item.split(':',1)[1] == item_id:
+                    item_to_send = item.split(':',1)[0]
+                    
+                    
+            for item in json.loads(currentFamily.inventory):
+                if item.split(':',1)[0] == item_to_send.split(':',1)[0]:
+                    
+                    quantity+=1 
+            return render_template("list_edit.html",family=currentFamily, item=item_to_send,quantity=quantity)
+        else:
+            return redirect('/')
+    elif request.method == "POST":
+        index = 0
+        count = 0
+        add_item_index = currentFamily.num_of_items_inventory
+        current_item = None
+        current_name = ""
+        new_name = request.form.get("item")
+        new_amount = request.form.get("quantity")
+
+
+        for item in json.loads(currentFamily.inventory):
+            if item.split(':',1)[1] == item_id:
+                current_item = item.split(':',1)[1]
+                current_name = item.split(':',1)[0]
+                for x in json.loads(currentFamily.inventory):
+                    if x.split(':',1)[0] == current_name:
+                        count+=1
+        if new_name != current_name:
+            for item in json.loads(currentFamily.inventory):
+                if item.split(':',1)[1] == item_id:
+                    new_list =json.loads(currentFamily.inventory)
+                    new_list[index] = new_name + f":{item_id}"
+                    currentFamily.inventory = json.dumps(new_list)
+                    db.session.commit()
+                    index+=1
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.inventory_audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} to a new name of {new_name}')
+            currentFamily.inventory_audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
+
+        if new_amount != count:
+            for item in json.loads(currentFamily.inventory):
+                if item.split(':',1)[1] == item_id:
+                    items_name = item.split(':',1)[0]
+                    for x in json.loads(currentFamily.inventory):
+                        if x.split(':',1)[0] == current_name:
+                            loaded_list =json.loads(currentFamily.inventory)
+                            loaded_list.remove(x)
+                            currentFamily.inventory = json.dumps(loaded_list)
+                            db.session.commit()
+                    for num_of_items in range (int(new_amount)):
+                        loaded_list =json.loads(currentFamily.inventory)
+                        loaded_list.append(f'{current_name}:{add_item_index}')
+                        add_item_index +=1
+                        currentFamily.inventory = json.dumps(loaded_list)
+                        currentFamily.num_of_items_inventory = add_item_index
+                        db.session.commit()
+            
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.inventory_audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} that had a quantity of {count} to have a new quantity of {new_amount}')
+            currentFamily.inventory_audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
+        
+        return redirect(f'/families/{id}/inventory')
+
+@views.route('/families/<id>/inventory/audit-log',methods=["POST","GET"])
+def inventory_audit_log(id):
+    currentFamily = Families.query.filter_by(_id=id).first()
+    families_auditLog = json.loads(currentFamily.inventory_audit_log)
+    length_of_audit_log = len(families_auditLog)
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            current_user = session.get("username")
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True:
+            return render_template("inventory_auditlog.html",family=currentFamily,auditLog=families_auditLog,auditLogLength=length_of_audit_log)
+        else: 
+            return redirect("/")
 
 
 @views.route('/families/<id>/list')
@@ -131,11 +393,11 @@ def family_list(id):
             current_user = session.get("username")
             for user in User.query.all():
                 if user.name == current_user:
-                    if current_user in currentFamily.members:
-                        canAccess = True
-                    elif current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
                         canAccess = True
                         canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
                 
         if canAccess == True:
             lengthOfList = len(json.loads(currentFamily.shopping_list))
@@ -146,12 +408,12 @@ def family_list(id):
     
     
     
-    
-    
-    
-@views.route('/families/<id>/list/add',methods=["POST","GET"])
-def add_item_to_list(id):
+
+@views.route('/families/<id>/list/audit-log',methods=["POST","GET"])
+def shopping_audit_log(id):
     currentFamily = Families.query.filter_by(_id=id).first()
+    families_auditLog = json.loads(currentFamily.list_audit_log)
+    length_of_audit_log = len(families_auditLog)
     if request.method == "GET":
 
         canAccess = False
@@ -164,27 +426,62 @@ def add_item_to_list(id):
             current_user = session.get("username")
             for user in User.query.all():
                 if user.name == current_user:
-                    if current_user in currentFamily.members:
-                        canAccess = True
-                    elif current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
                         canAccess = True
                         canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
         if canAccess == True:
-            return render_template("add_item.html",family=currentFamily,user_has_permissions=canManageFamily)
+            return render_template("list_auditlog.html",family=currentFamily,auditLog=families_auditLog,auditLogLength=length_of_audit_log)
+        else: 
+            return redirect("/")
+    
+    
+@views.route('/families/<id>/list/add',methods=["POST","GET"])
+def add_item_to_list(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True:
+            return render_template("add_item_list.html",family=currentFamily,user_has_permissions=canManageFamily)
         else: 
             return redirect("/")
     elif request.method == "POST":
         name_of_item = request.form.get("item_name")
         amount_of_item = int(request.form.get("quantity"))
         converted_list = json.loads(currentFamily.shopping_list)
-        length_of_existing_list = len(converted_list) + 1
+        length_of_existing_list = currentFamily.num_of_items_list
         for x in range(amount_of_item):
             converted_list.append(name_of_item +f" :{length_of_existing_list}")
             length_of_existing_list +=1
         completed_list = json.dumps(converted_list)
+        currentAuditLog = json.loads(currentFamily.list_audit_log)
+        current_time = datetime.datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        currentAuditLog.append(f'{formatted_time}: {current_user} has added {amount_of_item} of {name_of_item}(s)')
+        currentFamily.list_audit_log = json.dumps(currentAuditLog)
+
+
         currentFamily.shopping_list = completed_list
+        currentFamily.num_of_items_list = length_of_existing_list
         db.session.commit()
-        print(currentFamily.shopping_list)
+        
         return redirect(f"/families/{id}/list")
             
 
@@ -195,7 +492,7 @@ def add_item_to_list(id):
 def remove_item(id,item_id):
     currentFamily = Families.query.filter_by(_id=id).first()
     if request.method == "GET":
-
+        auditLogItem = None
         canAccess = False
         canManageFamily = False
 
@@ -206,17 +503,22 @@ def remove_item(id,item_id):
             current_user = session.get("username")
             for user in User.query.all():
                 if user.name == current_user:
-                    if current_user in currentFamily.members:
-                        canAccess = True
-                    elif current_user in currentFamily.admins or current_user == currentFamily.creator_name:
+                    if current_user in currentFamily.admins or current_user == currentFamily.creator_name:
                         canAccess = True
                         canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
         if canAccess == True and  canManageFamily == True:
             families_list = json.loads(currentFamily.shopping_list)
             for item in families_list:
                 if item.split(':',1)[1] == item_id:
                     families_list.remove(item)
-
+                    auditLogItem = item.split(':',1)[0]
+            currentAuditLog = json.loads(currentFamily.list_audit_log)
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog.append(f'{formatted_time}: {current_user} has removed {auditLogItem} from the list ')
+            currentFamily.list_audit_log = json.dumps(currentAuditLog)
             currentFamily.shopping_list = json.dumps(families_list)
             db.session.commit()
             return redirect(f'/families/{id}/list')
@@ -226,6 +528,107 @@ def remove_item(id,item_id):
 
 
 
+
+
+
+@views.route('/families/<id>/list/edit/<item_id>',methods=["POST","GET"])
+def edit_item(id,item_id):
+    currentFamily = Families.query.filter_by(_id=id).first()
+    current_user = session.get("username")
+    if request.method == "GET":
+
+        canAccess = False
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+
+
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user in currentFamily.members:
+
+                        canAccess = True
+
+        if canAccess == True:
+            item_to_send = None
+            quantity = 0
+            for item in json.loads(currentFamily.shopping_list):
+                
+                if item.split(':',1)[1] == item_id:
+                    item_to_send = item.split(':',1)[0]
+                    
+                    
+            for item in json.loads(currentFamily.shopping_list):
+                if item.split(':',1)[0] == item_to_send.split(':',1)[0]:
+                    
+                    quantity+=1 
+            return render_template("list_edit.html",family=currentFamily, item=item_to_send,quantity=quantity)
+        else:
+            return redirect('/')
+    elif request.method == "POST":
+        index = 0
+        count = 0
+        add_item_index = currentFamily.num_of_items_list
+        current_item = None
+        current_name = ""
+        new_name = request.form.get("item")
+        new_amount = request.form.get("quantity")
+
+
+        for item in json.loads(currentFamily.shopping_list):
+            if item.split(':',1)[1] == item_id:
+                current_item = item.split(':',1)[1]
+                current_name = item.split(':',1)[0]
+                for x in json.loads(currentFamily.shopping_list):
+                    if x.split(':',1)[0] == current_name:
+                        count+=1
+        if new_name != current_name:
+            for item in json.loads(currentFamily.shopping_list):
+                if item.split(':',1)[1] == item_id:
+                    new_list =json.loads(currentFamily.shopping_list)
+                    new_list[index] = new_name + f":{item_id}"
+                    currentFamily.shopping_list = json.dumps(new_list)
+                    db.session.commit()
+                    index+=1
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.list_audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} to a new name of {new_name}')
+            currentFamily.list_audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
+
+        if new_amount != count:
+            for item in json.loads(currentFamily.shopping_list):
+                if item.split(':',1)[1] == item_id:
+                    items_name = item.split(':',1)[0]
+                    for x in json.loads(currentFamily.shopping_list):
+                        if x.split(':',1)[0] == current_name:
+                            loaded_list =json.loads(currentFamily.shopping_list)
+                            loaded_list.remove(x)
+                            currentFamily.shopping_list = json.dumps(loaded_list)
+                            db.session.commit()
+                    for num_of_items in range (int(new_amount)):
+                        loaded_list =json.loads(currentFamily.shopping_list)
+                        loaded_list.append(f'{current_name}:{add_item_index}')
+                        add_item_index +=1
+                        currentFamily.shopping_list = json.dumps(loaded_list)
+                        currentFamily.num_of_items_list = add_item_index
+                        db.session.commit()
+            
+            current_time = datetime.datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            currentAuditLog = json.loads(currentFamily.list_audit_log)
+            currentAuditLog.append(f'{formatted_time}: {current_user} has edited of an item with the name {current_name} that had a quantity of {count} to have a new quantity of {new_amount}')
+            currentFamily.list_audit_log = json.dumps(currentAuditLog)
+            db.session.commit()
+        
+        return redirect(f'/families/{id}/list')
+        
+    
+    
+    
 
 
 @views.route("/create-family",methods=["POST","GET"])
@@ -253,7 +656,7 @@ def create_family():
                     users_families.append(family_name)
                     user.families = json.dumps(users_families)
                     db.session.commit()
-            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([]),json.dumps([]),json.dumps([]),json.dumps([]))
+            family_to_be_created = Families(family_name,family_owner,owners_email,json.dumps([family_owner]),json.dumps([]),json.dumps([]),json.dumps([]),0,0,json.dumps([]),json.dumps([]),json.dumps([]))
 
             db.session.add(family_to_be_created)
             db.session.commit()
@@ -283,13 +686,13 @@ def signup():
                 canCreateAccount = False
                 invalidEmail = True
         if canCreateAccount == True:
-            user = User(username,email,password,json.dumps([]))
+            user = User(username,email,password,json.dumps([]),"",json.dumps([]))
             db.session.add(user)
             db.session.commit()
             flash("You are signed in!")
             session['email'] = email
             session['username'] = username
-            return redirect("/families")
+            return redirect("/dashboard")
         else:
             if invalidEmail == True:
                 flash('You cannot create an account with this email as it already has been used!')
@@ -306,3 +709,839 @@ def signup():
     else:
         
      return render_template("signup.html")
+
+
+@views.route('/families/<id>/member-management')
+def member_management(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        ownerDBMODEL = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        amountOfAdmins = len(adminList)
+        amountOfMembers = len(memberList)
+        memberObjects = []
+        adminObjects = []
+
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+            for member in memberList:
+                memberObjects.append(User.query.filter_by(name=member).first())
+            for admin in adminList:
+                adminObjects.append(User.query.filter_by(name=admin).first())
+            
+            return render_template("memberManagement.html",memberInfo=memberObjects,adminInfo=adminObjects,member_amount=amountOfMembers,members=memberList,admin_amount=amountOfAdmins,admins=adminList,family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,ownerModel=ownerDBMODEL)
+        else: 
+            return redirect("/")
+        
+        
+@views.route('/families/<id>/member-management/<user_id>',methods=["POST","GET"])
+def view_user_acc(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+
+            
+            return render_template("viewMember.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,userToShow=userBeingManged)
+        else: 
+            return redirect("/")
+    elif request.method == "POST":
+        for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+
+
+@views.route('/families/<id>/member-management/invite',methods=["POST","GET"])
+def invite_user(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            
+            for user in User.query.all():
+                if user.name == current_user:
+                    if current_user == currentFamily.creator_name:
+                        canAccess= True
+                        canManageFamily = True
+                        isOwner = True
+                    if current_user in currentFamily.admins:
+                        canAccess = True
+                        canManageFamily = True
+                    elif current_user in currentFamily.members:
+                        canAccess = True
+        if canAccess == True and canManageFamily == True:
+            return render_template("invite_user.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner)
+        else: 
+            return redirect("/")
+        
+    elif request.method == "POST":
+        userFound = False
+        email_receiver = request.form.get("email")
+        for user in User.query.all():
+            if user.email == email_receiver:
+                userFound = True
+
+        if userFound == True:
+            adduser=True
+            newUser = True
+            notAdmin = True
+            notOwner = True
+            loaded_invited_users = json.loads(currentFamily.invited_users)
+            loaded_existing_users = json.loads(currentFamily.members)
+            loaded_admins = json.loads(currentFamily.admins)
+            
+            for user in loaded_invited_users:
+                if user == email_receiver:
+                    adduser = False
+            for user in loaded_existing_users:
+                users_db_model = User.query.filter_by(name=user).first()
+                if users_db_model.email == email_receiver:
+                    newUser = False
+            for user in loaded_admins:
+                users_db_model = User.query.filter_by(name=user).first()
+                if users_db_model.email == email_receiver:
+                    newUser = False
+            if email_receiver == currentFamily.creator_email:
+                notOwner = False
+            if adduser == True and newUser == True and notAdmin == True and notOwner == True:
+                
+                loaded_invited_users.append(email_receiver)
+                currentFamily.invited_users = json.dumps(loaded_invited_users)
+                db.session.commit()
+                sending_email = "virtualshoppinglistmanager@gmail.com"
+                password = "kdnfadoxwpxgovqz"
+                subject = f"You have been invited to {currentFamily.name} on Virtual Shopping List!"
+                body = f"Hello! A user with the name {current_user} has invited you to their family {currentFamily.name} on Virtual Shopping List! Please click the link below to join their family.\n\n virtualshoppinglist.com/join/{currentFamily._id}/{email_receiver}"
+                em = EmailMessage()
+                em['From'] = sending_email
+                em['To'] = email_receiver
+                em['subject'] = subject
+                em.set_content(body)
+                context = ssl.create_default_context()
+
+                with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp:
+                    smtp.login(sending_email,password)
+                    smtp.sendmail(sending_email,email_receiver,em.as_string())
+
+            
+            
+                    
+        return redirect(f'/families/{id}/member-management')
+
+
+@views.route('/join/<id>/<email>',methods=["POST","GET"])
+def join_family(id,email):
+    currentUser = None
+    canJoin = False
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        for user in User.query.all():
+            if user.email == email:
+                currentUser = user
+        loaded_invited_users = json.loads(currentFamily.invited_users)
+        for invited_user in loaded_invited_users:
+            if invited_user == currentUser.email:
+                canJoin = True
+        if canJoin == True:
+            return render_template("auth.html")
+        else:
+            return redirect('/')
+    elif request.method == "POST":
+        canLogin = False
+        correctUser = False
+        usingEmail = False
+        lookForEmail = False
+        username = request.form.get("username")
+        password = request.form.get("password")
+        for entry in User.query.all():
+            if entry.name == username and entry.password == password:
+                canLogin = True
+            if entry.name == username:
+                currentUser = entry
+                
+                
+                
+        lookForEmail =True
+        if canLogin == False:
+            for entry in User.query.all():
+                if entry.email == username and entry.password == password:
+                    canLogin = True
+                    lookForEmail = False
+                    usingEmail = True
+                
+                if entry.email == username:
+                    currentUser = entry
+
+        
+        if currentUser == None:
+            return redirect("/")
+        
+        if currentUser.email == email:
+            correctUser = True
+        
+
+        if canLogin == True and correctUser == True:
+            if usingEmail == True:
+                session['email'] = username
+                session['password'] = password
+                current_user = User.query.filter_by(email=username).first()
+                session['username'] = current_user.name
+                username = current_user.name
+            else:
+                session['username'] = username
+                session['password'] = password
+            memberAlreadyIn = False
+            alreadyInFamily =  False
+            loaded_members = json.loads(currentFamily.members)
+            for member in loaded_members:
+                if member == username:
+                    memberAlreadyIn = True
+            loaded_family_list = json.loads(currentUser.families)
+            for family in loaded_family_list:
+                if family == currentFamily.name:
+                    alreadyInFamily = True
+            if alreadyInFamily == False and memberAlreadyIn == False:    
+  
+                loaded_members.append(username)
+                loaded_family_list.append(currentFamily.name)
+                currentFamily.members = json.dumps(loaded_members)
+                currentUser.families = json.dumps(loaded_family_list)
+                db.session.commit()
+                return redirect("/families")
+            else:
+                return redirect('/families')
+        elif canLogin == False:
+            flash("You were not logged in, please check your username and password.")
+            return redirect("/")
+
+
+@views.route('/families/<id>/member-management/<user_id>/kick',methods=["POST","GET"])
+def kick_user(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        
+        user_db_model = User.query.filter_by(name=current_user).first()
+
+        
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        userIsAdmin = False
+        userIsMember = False
+        loadedInvitedUsers = json.loads(currentFamily.invited_users)
+
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        elif user_db_model.name in adminList:
+            canAccessPage= True
+        else:
+            canAccessPage = False    
+        
+        if canAccessPage == True:
+                
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+
+            users_families = json.loads(userBeingManged.families)
+            
+            for member in adminList:
+                if member == userBeingManged.name:
+                    userIsAdmin = True
+            
+            if userIsAdmin == False:
+                for member in memberList:
+                    if member == userBeingManged.name:
+                        userIsMember = True
+            
+            if userIsMember == True:
+                memberList.remove(userBeingManged.name)
+                currentFamily.members = json.dumps(memberList)
+                db.session.commit()
+            elif userIsAdmin == True:
+                adminList.remove(userBeingManged.name)
+                currentFamily.admins = json.dumps(adminList)
+                db.session.commit()
+            
+            for family in users_families:
+                if family == currentFamily.name:
+                    users_families.remove(family)
+            
+            for user in loadedInvitedUsers:
+                if user == userBeingManged.email:
+                    loadedInvitedUsers.remove(user)
+                    currentFamily.invited_users = json.dumps(loadedInvitedUsers)
+                    db.session.commit()
+                    
+            userBeingManged.families = json.dumps(users_families)
+            db.session.commit()
+                    
+            return redirect(f'/families/{id}/member-management')
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+
+
+@views.route('/families/<id>/member-management/<user_id>/manage-role',methods=["POST","GET"])
+def manage_user_role(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        currentRole = ""
+        
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+        
+            for admin in adminList:
+                if admin == userBeingManged.name:
+                    currentRole = "admin"
+                    
+                    
+            for member in memberList:
+                if member == userBeingManged.name:
+                    currentRole = "member"
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+
+                
+                return render_template("changeRole.html",family=currentFamily,user_has_permissions=canManageFamily,owner=isOwner,userToShow=userBeingManged,currentRole=currentRole)
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+        
+        
+@views.route('/families/<id>/member-management/<user_id>/admin',methods=["POST","GET"])
+def make_user_admin(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            for member in memberList:
+                if member == userBeingManged.name:
+                    memberList.remove(member)
+                    currentFamily.members = json.dumps(memberList)
+                    db.session.commit()
+            
+            adminList.append(userBeingManged.name)
+            currentFamily.admins = json.dumps(adminList)
+            db.session.commit()
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                print(currentFamily.members)
+                return redirect(f'/families/{id}/member-management/{user_id}')
+                
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+
+@views.route('/families/<id>/member-management/<user_id>/member',methods=["POST","GET"])
+def make_user_member(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            for admin in adminList:
+                if admin == userBeingManged.name:
+                    adminList.remove(admin)
+                    currentFamily.admins = json.dumps(adminList)
+                    db.session.commit()
+            
+            memberList.append(userBeingManged.name)
+            currentFamily.members = json.dumps(memberList)
+            db.session.commit()
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                print(currentFamily.members)
+                return redirect(f'/families/{id}/member-management/{user_id}')
+                
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+        
+        
+
+@views.route('/families/<id>/member-management/<user_id>/transfer-ownership',methods=["POST","GET"])
+def transfer_ownership(id,user_id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        userBeingManged= User.query.filter_by(_id=user_id).first()
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            owner_db_model = User.query.filter_by(name=currentFamily.creator_name).first()
+            new_owner = userBeingManged
+            currentFamily.creator_name = new_owner.name
+            currentFamily.creator_email = new_owner.email
+            db.session.commit()
+            for admin in adminList:
+                if admin == new_owner.name:
+                    adminList.remove(admin)
+                    currentFamily.admins = json.dumps(adminList)
+                    db.session.commit()
+                    
+                    
+            new_list = json.loads(currentFamily.members)
+            print(new_list)
+            new_list.append(currentFamily.creator_name)
+            print(new_list)
+            currentFamily.members = json.dumps(new_list)
+            db.session.commit()
+            print(currentFamily.members)
+
+            
+            if session.get("username") == None:
+                flash("You must be logged in!")
+                return redirect("/")
+            else:
+                
+                for user in User.query.all():
+                    if user.name == current_user:
+                        if current_user == currentFamily.creator_name:
+                            canAccess= True
+                            canManageFamily = True
+                            isOwner = True
+                        if current_user in currentFamily.admins:
+                            canAccess = True
+                            canManageFamily = True
+                        elif current_user in currentFamily.members:
+                            canAccess = True
+            if canAccess == True and canManageFamily == True:
+                return redirect(f'/families/{id}')
+                
+                
+            else: 
+                return redirect("/")
+        else:
+            return redirect(f'/families/{id}/member-management/{user_id}')
+
+
+@views.route('/families/<id>/family-management',methods=["POST","GET"])
+def manage_family(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            return render_template("familyManagement.html",family=currentFamily)
+        else:
+            return redirect(f'/families/{id}')
+    elif request.method == "POST":
+        new_family_name = request.form.get("newname")
+        canCreateFamily = True
+        for family in Families.query.all():
+            if family.name == new_family_name:
+                canCreateFamily = False
+        if canCreateFamily == True:
+            currentFamily.name = new_family_name
+            db.session.commit()
+            return redirect(f'/families/{id}')
+        else:
+            return redirect(f'/families/{id}/family-management')
+
+@views.route('/families/<id>/delete',methods=["POST","GET"])
+def delete_family(id):
+    current_user = session.get("username")
+    currentFamily = Families.query.filter_by(_id=id).first()
+    if request.method == "GET":
+        user_db_model = User.query.filter_by(name=current_user).first()
+        canAccess = False
+        canManageFamily = False
+        isOwner = False
+        adminList = json.loads(currentFamily.admins)
+        memberList = json.loads(currentFamily.members)
+        currentRole = ""
+        
+        canAccessPage = False
+        if user_db_model.name == currentFamily.creator_name:
+            canAccessPage = True
+        else:
+            canAccessPage = False 
+        
+        if canAccessPage == True:
+            db.session.delete(currentFamily)
+            db.session.commit()
+            for user in User.query.all():
+                if currentFamily.name in user.families:
+                    loaded_list = json.loads(user.families)
+                    loaded_list.remove(currentFamily.name)
+                    converted_list = json.dumps(loaded_list)
+                    user.families = converted_list
+                    db.session.commit()
+            return redirect('/families')
+        else:
+            return redirect('/families')
+
+
+@views.route('/forgot-password',methods=["POST","GET"])
+def forgot_password():
+    userFoundByEmail = False
+    userFoundByName = False
+    if request.method == "GET": 
+        return render_template("forgotPassword.html")
+    elif request.method == "POST":
+        email = request.form.get("username")
+        user = User.query.filter_by(name=email).first()
+        if user != None:
+            userFoundByName = True
+        else:
+            user = User.query.filter_by(email=email).first()
+            if user != None:
+                userFoundByEmail = True
+            else:
+                flash("There is not an account with this username or password.")
+                return render_template("forgotPassword.html")
+        if userFoundByEmail == True:
+            user = User.query.filter_by(email=email).first()
+            email_receiver = email
+            sending_email = "virtualshoppinglistmanager@gmail.com"
+            password = "kdnfadoxwpxgovqz"
+            subject = f"Password reset for {user.name} on Virtual Shopping List"
+            body = f"Hello! This email is to reset the password for the account {user.name}. Please click the link below to reset your password. \n\nvirtualshoppinglist.com/users/{email}/reset_password "
+            em = EmailMessage()
+            em['From'] = sending_email
+            em['To'] = email_receiver
+            em['subject'] = subject
+            em.set_content(body)
+            context = ssl.create_default_context()
+
+            with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp:
+                smtp.login(sending_email,password)
+                smtp.sendmail(sending_email,email_receiver,em.as_string())
+                
+            flash("An email has been sent with further instructions.")
+                
+        elif userFoundByName == True:
+             user = User.query.filter_by(name=email).first()
+             email_receiver = user.email
+             sending_email = "virtualshoppinglistmanager@gmail.com"
+             password = "kdnfadoxwpxgovqz"
+             subject = f"Password reset for {user.name} on Virtual Shopping List"
+             body = f"Hello! This email is to reset the password for the account {user.name}. Please click the link below to reset your password. \n\nvirtualshoppinglist.com/users/{user.email}/reset_password\n\n DO NOT SHARE THIS LINK WITH ANYONE! "
+             em = EmailMessage()
+             em['From'] = sending_email
+             em['To'] = email_receiver
+             em['subject'] = subject
+             em.set_content(body)
+             context = ssl.create_default_context()
+
+             with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp:
+                smtp.login(sending_email,password)
+                smtp.sendmail(sending_email,email_receiver,em.as_string())
+             
+             flash("An email has been sent with further instructions.")
+            
+            
+        return render_template("forgotPassword.html")
+
+
+@views.route('/users/<email>/reset_password',methods=["POST","GET"])
+def reset_password(email):
+    currentUser = User.query.filter_by(email=email).first()
+    if request.method == "GET":
+        return render_template("resetPassword.html",username=currentUser.name,email=email)
+    elif request.method == "POST":
+        password_one = request.form.get("password1")
+        password_two = request.form.get("password2")
+        
+        if password_one == password_two:
+            currentUser.password = password_one
+            db.session.commit()
+            flash("Password updated!")
+            return redirect("/login")
+        else:
+            flash("Passwords do not match, please try again.")
+
+
+
+@views.route('/dashboard')
+def dashboard():
+    if request.method == "GET": 
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            users_name = session.get("username")
+            usr = User.query.filter_by(name=users_name).first()
+            return render_template("dashboard.html",user=usr)
+
+@views.route('/my-profile')
+def profile():
+    if request.method == "GET": 
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            users_name = session.get("username")
+            usr = User.query.filter_by(name=users_name).first()
+            return render_template("profile.html",user=usr)
+
+
+@views.route('/users/<user_id>/edit-bio',methods=["POST","GET"])
+def edit_bio(user_id):
+    if request.method == "GET":
+        return render_template("login.html") 
+    elif request.method == "POST":
+        canLogin = False
+        lookForEmail = False
+        usingEmail = False
+        username = request.form.get("username")
+        password = request.form.get("password")
+        for entry in User.query.all():
+
+            if entry.name == username and entry.password == password and  entry._id == int(user_id):
+                canLogin = True
+        lookForEmail =True
+        if canLogin == False:
+            for entry in User.query.all():
+                if entry.email == username and entry.password == password and  entry._id == int(user_id):
+                    canLogin = True
+                    lookForEmail = False
+                    usingEmail = True
+        if canLogin == True:
+            if usingEmail == True:
+                session['email'] = username
+                session['password'] = password
+                current_user = User.query.filter_by(email=username).first()
+                session['username'] = current_user.name
+                
+            else:
+                session['username'] = username
+                session['password'] = password
+            
+            if usingEmail == True:
+                email = session["email"]
+                current_user = User.query.filter_by(email=email).first()
+                return render_template("editBio.html",user=current_user)
+            else:
+                name = session['username']
+                current_user = User.query.filter_by(name=name).first()
+                return render_template("editBio.html",user=current_user)
+        elif canLogin == False:
+            flash("You were not logged in, please check your username and password.")
+            return redirect("/login")
+        
+        
+
+@views.route('/users/<user_id>/submit-bio',methods=["POST","GET"])
+def submit_bio(user_id):
+    if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        
+        
+    username = session.get("username")
+    user = User.query.filter_by(_id=user_id).first()
+    if username == user.name:
+        newbio = request.form.get("newbio")
+        user.bio = newbio
+        db.session.commit()
+        return redirect('/my-profile')
+
+
+
+@views.route('/add-friend',methods=["POST","GET"])
+def add_friend():
+    displayingResults = False
+    if request.method == "GET":
+        if session.get("username") == None:
+            flash("You must be logged in!")
+            return redirect("/")
+        else:
+            username = session.get("username")
+            usr = User.query.filter_by(name=username).first()
+            return render_template("add_friend.html",user=usr,displayingResults=displayingResults)
+        
+    elif request.method == "POST":
+        accname = request.form.get("accname")
+        accounts_with_matching_name = []
+        for user in User.query.all():
+            if accname in user.name:
+                accounts_with_matching_name.append(user)
+
+        lenOfResults = len(accounts_with_matching_name)
+        displayingResults = True
+        return render_template("add_friend.html",displayingResults=displayingResults,lenOfResults=lenOfResults,matchingAccounts=accounts_with_matching_name)
+    

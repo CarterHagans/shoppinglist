@@ -1,58 +1,55 @@
-<title>{{ family.name }} - Shopping List</title>
+<title>{{ family.name }} - Inventory</title>
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
 </head>
 
-<body id="listBody">
+<body id="inventoryBody">
     <div class="container">
         <div class="row">
           <div class="col-md-12 text-center">
-            <h3 class="animate-list"> {{ family.name }} - Shopping List</h3>
+            <h3 class="animate-list"> {{ family.name }} - Inventory</h3>
           </div>
         </div>
       </div>
 
       {% if length_of_list == 0 %}
-      <p id="listHead"class="h1">You have no items in your shopping list.</p>
-      <a href="/families/{{family._id}}/list/add">
-        <button id="listBtn1" type="button" class="btn btn-primary btn-lg btn-block">Add an item to your list</button>
+      <p id="listHead"class="h1">You have no items in your families inventory.</p>
+      <a href="/families/{{family._id}}/inventory/add">
+        <button id="listBtn1" type="button" class="btn btn-primary btn-lg btn-block">Add an item to your inventory</button>
         </a>
-      <a href="/families/{{family._id}}/list/audit-log">
+      <a href="/families/{{family._id}}/inventory/audit-log">
         <button  id="listBtn2" type="button" class="btn btn-secondary btn-lg btn-block">Audit Log</button>
       </a>
       <a href="/families/{{family._id}}">
         <button id="listBtn3" type="button" class="btn btn-danger btn-lg btn-block">Back to family main page</button>
         </a>
       {% else %}
-
-      {% for item in list %}
+      
+      {% for item in inventory %}
 
       <div id="test">
         <a id="listitem"  class="list-group-item list-group-item-action">{{ item.split(":",1)[0] }}</a>
-        
         {% if user_has_permissions == True %}
 
-        <a href="/families/{{family._id}}/list/remove/{{item.split(':',1)[1]}}">
+        <a href="/families/{{family._id}}/inventory/remove/{{item.split(':',1)[1]}}">
         <button id="removebtn" >Remove</button>
         </a>
-        <a href="/families/{{family._id}}/list/edit/{{item.split(':',1)[1]}}">
+        <a href="/families/{{family._id}}/inventory/edit/{{item.split(':',1)[1]}}">
         <button id="editbtn">Edit</button>
         </a>
         {% endif %}
       </div>
 
-
       {% endfor %}
-      <a href="/families/{{family._id}}/list/add">
-        <button id="listBtn1" type="button" class="btn btn-primary btn-lg btn-block">Add an item to your list</button>
+      <a href="/families/{{family._id}}/inventory/add">
+        <button id="listBtn1" type="button" class="btn btn-primary btn-lg btn-block">Add an item to your inventory</button>
         </a>
-      <a href="/families/{{family._id}}/list/audit-log">
+      <a href="/families/{{family._id}}/inventory/audit-log">
         <button  id="listBtn2" type="button" class="btn btn-secondary btn-lg btn-block">Audit Log</button>
       </a>
       <a href="/families/{{family._id}}">
         <button id="listBtn3" type="button" class="btn btn-danger btn-lg btn-block">Back to family main page</button>
         </a>
       {% endif %}
-
 </body>
